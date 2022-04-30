@@ -215,11 +215,11 @@ public class Window {
             camera.mouseUpdate(glfwWindow, width, height);
             camera.keyboardUpdate(dt);
 
-//            Matrix4f rotation = new Matrix4f();
-//            new Matrix4f().translate(modelOrigin.mul(-1.0f, new Vector3f())).mul(rotation, rotation);
-//            new Matrix4f().rotate(dt, axisToRotate.normalize()).mul(rotation, rotation);
-//            new Matrix4f().translate(modelOrigin).mul(rotation, rotation);
-//            rotation.mul(transform, transform);
+            Matrix4f rotation = new Matrix4f();
+            new Matrix4f().translate(modelOrigin.mul(-1.0f, new Vector3f())).mul(rotation, rotation);
+            new Matrix4f().rotate(dt, axisToRotate.normalize()).mul(rotation, rotation);
+            new Matrix4f().translate(modelOrigin).mul(rotation, rotation);
+            rotation.mul(transform, transform);
 
             shader.upload("view", camera.getViewMatrix());
             shader.upload("transform", transform);
