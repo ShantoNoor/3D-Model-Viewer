@@ -1,0 +1,4 @@
+**.log
+**/.DS_Store
+/TestModels/*
+!/TestModels/Drawing4.stl
