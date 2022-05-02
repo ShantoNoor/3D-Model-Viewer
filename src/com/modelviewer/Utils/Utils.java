@@ -6,6 +6,7 @@ import org.lwjgl.assimp.AIMatrix4x4;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.opengl.GL11.glGetIntegerv;
@@ -48,11 +49,32 @@ public class Utils {
         return mat;
     }
 
-    public static FloatBuffer convertFloatArrayToFloatBuffer(float[] data) {
-        FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
-        buffer.put(data);
-        buffer.flip();
-        return buffer;
+    public static float[] convertFloatArrayListToFloatArray(ArrayList<Float> floatArrayList) {
+        float[] floatArray = new float[floatArrayList.size()];
+        for(int i = 0; i < floatArrayList.size(); ++i) {
+            floatArray[i] = floatArrayList.get(i);
+        }
+        return floatArray;
+    }
+
+    public static FloatBuffer convertFloatArrayToFloatBuffer(float[] floatArray) {
+        FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(floatArray.length);
+        floatBuffer.put(floatArray);
+        floatBuffer.flip();
+        return floatBuffer;
+    }
+
+    public static FloatBuffer convertFloatArrayListToFloatBuffer(ArrayList<Float> floatArrayList) {
+        float[] floatArray = convertFloatArrayListToFloatArray(floatArrayList);
+        return convertFloatArrayToFloatBuffer(floatArray);
+    }
+
+    public static int[] convertIntArrayListToIntArray(ArrayList<Integer> intArrayList) {
+        int[] intArray = new int[intArrayList.size()];
+        for(int i = 0; i < intArrayList.size(); ++i) {
+            intArray[i] = intArrayList.get(i);
+        }
+        return intArray;
     }
 
     public static IntBuffer convertIntArrayToIntBuffer(int[] data) {
@@ -60,6 +82,11 @@ public class Utils {
         buffer.put(data);
         buffer.flip();
         return buffer;
+    }
+
+    public static IntBuffer convertIntArrayListToIntBuffer(ArrayList<Integer> intArrayList) {
+        int[] intArray = convertIntArrayListToIntArray(intArrayList);
+        return convertIntArrayToIntBuffer(intArray);
     }
 
     public static void printVector3f(Vector3f vec3) {
