@@ -1,7 +1,6 @@
 package com.modelviewer.Renderer.Mesh;
 
 import com.modelviewer.Renderer.Shader;
-import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -41,8 +40,16 @@ public class Model {
 
     private boolean modelSuccessfullyLoaded = false;
 
-    public Vector3f min = new Vector3f(Float.MAX_VALUE);
-    public Vector3f max = new Vector3f(Float.MIN_VALUE);
+    private Vector3f min = new Vector3f(Float.MAX_VALUE);
+    private Vector3f max = new Vector3f(Float.MIN_VALUE);
+
+    private Vector3f origin = new Vector3f(0.0f);
+
+    private float distance;
+    private float minDistance = 15.0f;
+    private float maxDistance = 30.0f;
+
+    private Matrix4f transform = new Matrix4f();
 
 
     public Model() { }
@@ -75,9 +82,11 @@ public class Model {
         if(pScene != null) {
             ret = initFromScene(pScene, filePath);
             processMeshTransform(pScene.mRootNode(), new Matrix4f());
+            adjustTransform();
         } else {
             ret = false;
             System.out.println("Error parsing: " + filePath + " " + Assimp.aiGetErrorString().toString());
+            System.exit(-1);
         }
 
         glBindVertexArray(0);
@@ -85,6 +94,27 @@ public class Model {
         modelSuccessfullyLoaded = ret;
 
         return ret;
+    }
+
+    private void adjustTransform() {
+        distance = Vector3f.distance(max.x, max.y, max.z, min.x, min.y, min.z);
+
+        if(distance > maxDistance || distance < minDistance) {
+            new Matrix4f().scale(maxDistance / distance).mul(transform, transform);
+
+            max = Utils.mulVector3fWithMatrix4f(max, transform);
+            min = Utils.mulVector3fWithMatrix4f(min, transform);
+
+            distance = Vector3f.distance(max.x, max.y, max.z, min.x, min.y, min.z);
+        }
+
+        origin = max.add(min, origin).mul(0.5f, origin);
+
+        Matrix4f translateToOrigin = new Matrix4f().translate(origin.mul(-1.0f, new Vector3f()));
+
+        translateToOrigin.mul(transform, transform);
+
+        origin = Utils.mulVector3fWithMatrix4f(origin, translateToOrigin);
     }
 
     private void processMeshTransform(AINode node, Matrix4f pTransform) {
@@ -129,7 +159,7 @@ public class Model {
     // private void clear() {}
 
     public void render(Shader shader) {
-        shader.use();
+        shader.activate();
         glBindVertexArray(vaoID);
 
         if(modelSuccessfullyLoaded) {
@@ -140,7 +170,7 @@ public class Model {
         }
 
         glBindVertexArray(0);
-        shader.detach();
+        shader.deactivate();
     }
 
     private boolean initFromScene(AIScene pScene, String filePath) {
@@ -260,27 +290,35 @@ public class Model {
 
         glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[POSITION_BUFFER]);
         glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(positions), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(Constants.POSITION_LOCATION);
-        glVertexAttribPointer(Constants.POSITION_LOCATION, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[TEX_COORD_BUFFER]);
         glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(texCords), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(Constants.TEX_COORD_LOCATION);
-        glVertexAttribPointer(Constants.TEX_COORD_LOCATION,  2, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1,  2, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[NORMAL_BUFFER]);
         glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(normals), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(Constants.NORMAL_LOCATION);
-        glVertexAttribPointer(Constants.NORMAL_LOCATION, 3, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[COLOR_BUFFER]);
         glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(colors), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(Constants.COLOR_LOCATION);
-        glVertexAttribPointer(Constants.COLOR_LOCATION, 4, GL_FLOAT, false, 0, 0);
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 4, GL_FLOAT, false, 0, 0);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIDs[INDEX_BUFFER]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, Utils.convertIntArrayToIntBuffer(indices), GL_STATIC_DRAW);
 
         glBindVertexArray(0);
+    }
+
+    public Matrix4f getTransform() {
+        return transform;
+    }
+
+    public float getDistance() {
+        return distance;
     }
 }

@@ -19,47 +19,52 @@ public class Shader {
 
     private String vertexSource;
     private String fragmentSource;
-    private String filepath;
+    private String vertexSourcePath;
+    private String fragmentSourcePath;
 
-    public Shader(String filepath) {
-        this.filepath = filepath;
-        try {
-            String source = new String(Files.readAllBytes(Paths.get(filepath)));
-            String[] splitString = source.split("(#type)( )+([a-zA-Z]+)");
+    public Shader(String vertexSourcePath, String fragmentSourcePath) {
+        this.vertexSourcePath = vertexSourcePath;
+        this.fragmentSourcePath = fragmentSourcePath;
 
-            int index = source.indexOf("#type") + 6;
-            int endOfLine = source.indexOf("\n", index);
-            String firstPattern = source.substring(index, endOfLine).trim();
-
-            index = source.indexOf("#type", endOfLine) + 6;
-            endOfLine = source.indexOf("\n", index);
-            String secondPattern = source.substring(index, endOfLine).trim();
-
-            if(firstPattern.equals("vertex")) {
-                vertexSource = splitString[1];
-            } else if(firstPattern.equals("fragment")) {
-                fragmentSource = splitString[1];
-            } else {
-                throw new IOException("Unexpected token " + firstPattern + " in " + filepath);
-            }
-
-            if(secondPattern.equals("vertex")) {
-                vertexSource = splitString[2];
-            } else if(secondPattern.equals("fragment")) {
-                fragmentSource = splitString[2];
-            } else {
-                throw new IOException("Unexpected token " + secondPattern + " in " + filepath);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            assert false : "Error unable to open file for shader: " + filepath;
+        if(vertexSourcePath == null) {
+            System.out.println("Vertex Source Path is null.");
+            System.exit(-1);
         }
 
-        compile();
+        if(fragmentSourcePath == null) {
+            System.out.println("Fragment Source Path is null.");
+            System.exit(-1);
+        }
+
+        this.vertexSource = read(vertexSourcePath);
+        this.fragmentSource = read(fragmentSourcePath);
+    }
+
+    public String read(String filePath) {
+        String source = null;
+
+        try {
+            source = new String(Files.readAllBytes(Paths.get(filePath)));
+        } catch (IOException e) {
+            System.out.println("Error unable to open Shader file: " + filePath);
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return source;
     }
 
     public void compile() {
+        if(vertexSource == null) {
+            System.out.println("Vertex Source is null.");
+            System.exit(-1);
+        }
+
+        if(fragmentSource == null) {
+            System.out.println("Fragment Source is null.");
+            System.exit(-1);
+        }
+
         int vertexID, fragmentID;
         vertexID = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexID, vertexSource);
@@ -68,9 +73,9 @@ public class Shader {
         int success = glGetShaderi(vertexID, GL_COMPILE_STATUS);
         if(success == GL_FALSE) {
             int len = glGetShaderi(vertexID, GL_INFO_LOG_LENGTH);
-            System.out.println("Vertex Shader compilation failed: " + filepath);
+            System.out.println("Vertex Shader compilation failed: " + vertexSourcePath);
             System.out.println(glGetShaderInfoLog(vertexID, len));
-            assert false : "";
+            System.exit(-1);
         }
 
         fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
@@ -80,9 +85,9 @@ public class Shader {
         success = glGetShaderi(fragmentID, GL_COMPILE_STATUS);
         if(success == GL_FALSE) {
             int len = glGetShaderi(fragmentID, GL_INFO_LOG_LENGTH);
-            System.out.println("Fragment Shader compilation failed: " + filepath);
+            System.out.println("Fragment Shader compilation failed: " + fragmentSourcePath);
             System.out.println(glGetShaderInfoLog(fragmentID, len));
-            assert false : "";
+            System.exit(-1);
         }
 
         shaderProgramID = glCreateProgram();
@@ -93,24 +98,24 @@ public class Shader {
         success = glGetProgrami(shaderProgramID, GL_LINK_STATUS);
         if(success == GL_FALSE) {
             int len = glGetProgrami(shaderProgramID, GL_INFO_LOG_LENGTH);
-            System.out.println("Shader program linking failed: " + filepath);
+            System.out.println("Shader program linking failed: " + vertexSourcePath + " " + fragmentSourcePath);
             System.out.println(glGetProgramInfoLog(shaderProgramID, len));
-            assert false : "";
+            System.exit(-1);
         }
     }
 
-    public void use() {
+    public void activate() {
         glUseProgram(shaderProgramID);
     }
 
-    public void detach() {
+    public void deactivate() {
         glUseProgram(0);
     }
 
     public void upload(String varName, Matrix4f mat4) {
-        use();
+        activate();
         uploadN(varName, mat4);
-        detach();
+        deactivate();
     }
 
     public void uploadN(String varName, Matrix4f mat4) {
@@ -118,13 +123,12 @@ public class Shader {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         mat4.get(buffer);
         glUniformMatrix4fv(varLocation, false, buffer);
-//        mat4.identity();
     }
 
     public void upload(String varName, Vector3f vec3) {
-        use();
+        activate();
         uploadN(varName, vec3);
-        detach();
+        deactivate();
     }
 
     public void uploadN(String varName, Vector3f vec3) {
@@ -135,10 +139,10 @@ public class Shader {
     }
 
     public void upload(String varName, float value) {
-        use();
+        activate();
         int varLocation = glGetUniformLocation(shaderProgramID, varName);
         glUniform1f(varLocation, value);
-        detach();
+        deactivate();
     }
 }
 

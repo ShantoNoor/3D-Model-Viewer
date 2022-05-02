@@ -2,8 +2,8 @@ package com.modelviewer.Camera;
 
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
-import com.modelviewer.Window.IO.KeyListener;
-import com.modelviewer.Window.IO.MouseListener;
+import com.modelviewer.Window.Input.KeyListener;
+import com.modelviewer.Window.Input.MouseListener;
 import org.joml.*;
 import org.joml.Math;
 

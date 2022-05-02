@@ -1,11 +1,14 @@
 package com.modelviewer.Renderer;
 
+import com.modelviewer.Utils.Utils;
 import org.lwjgl.BufferUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.stb.STBImage.*;
 
 public class Texture {
@@ -59,6 +62,9 @@ public class Texture {
             } else if (channels.get(0) == 4) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0),
                         0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+            } else if (channels.get(0) == 1) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width.get(0), height.get(0),
+                        0, GL_RGBA, GL_UNSIGNED_BYTE, image);
             } else {
                 System.out.println("Error: (Texture) Unknown number of channesl '" + channels.get(0) + "'");
             }
@@ -69,7 +75,14 @@ public class Texture {
         stbi_image_free(image);
     }
 
-    public void bind() {
+    public void bind(Shader shader, String shaderSamplerName, int textureSlot) {
+        if(textureSlot >= Utils.queryNumberOfMaxTextureUnits()) {
+            System.out.println("Texture slot number is greater than max texture units number.");
+            System.exit(-1);
+        }
+
+        shader.upload(shaderSamplerName, textureSlot);
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, texID);
     }
 

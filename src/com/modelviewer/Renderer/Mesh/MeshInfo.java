@@ -1,6 +1,5 @@
 package com.modelviewer.Renderer.Mesh;
 
-import com.modelviewer.Utils.Constants;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -18,7 +17,7 @@ public class MeshInfo {
         this.numberOfIndices = 0;
         this.baseVertex = 0;
         this.baseIndex = 0;
-        this.materialIndex = Constants.INVALID_MATERIAL;
+        this.materialIndex = 0;
         this.modelTransform = new Matrix4f();
         this.min = new Vector3f();
         this.max = new Vector3f();

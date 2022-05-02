@@ -7,7 +7,15 @@ import org.lwjgl.assimp.AIMatrix4x4;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static org.lwjgl.opengl.GL11.glGetIntegerv;
+import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
+
 public class Utils {
+    public static float getTime() {
+        return (float) glfwGetTime();
+    }
+
     public static Vector3f mulVector3fWithMatrix4f(Vector3f vec3, Matrix4f mat4) {
         Vector4f vec4 = new Vector4f(vec3, 1.0f);
         vec4.mul(mat4, vec4);
@@ -87,5 +95,11 @@ public class Utils {
 
     public static Vector3f getAxisAsVector3fFromAxisAngle4f(AxisAngle4f axisAngle) {
         return new Vector3f(axisAngle.x, axisAngle.y, axisAngle.z);
+    }
+
+    public static int queryNumberOfMaxTextureUnits() {
+        IntBuffer maximumTextureUnits = BufferUtils.createIntBuffer(1);
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, maximumTextureUnits);
+        return maximumTextureUnits.get();
     }
 }
