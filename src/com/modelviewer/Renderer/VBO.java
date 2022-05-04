@@ -17,12 +17,22 @@ public class VBO {
         glBindBuffer(GL_ARRAY_BUFFER, id);
     }
 
-    public void uploadVertexAttributeData(VAO vao, ArrayList<Float> data, int attributeIndex, int singleVertexAttributeSize,
-                                          int vertexAttributeStartOffset, int nextVertexAttributeOffsetSize, BufferDataType bufferDataType) {
+    public void uploadVertexAttributeData(VAO vao, ArrayList<Float> data, int attributeIndex, int singleVertexAttributeLength,
+                int singleVertexSizeInBytes, int singleVertexAttributeStartingOffsetSizeInBytes, BufferDataType bufferDataType) {
         vao.bind();
         bind();
         glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayListToFloatBuffer(data), bufferDataType.getValue());
-        vao.updateVertexAttributePointer(attributeIndex, singleVertexAttributeSize, vertexAttributeStartOffset, nextVertexAttributeOffsetSize);
+        vao.updateVertexAttributePointer(attributeIndex, singleVertexAttributeLength, singleVertexSizeInBytes, singleVertexAttributeStartingOffsetSizeInBytes);
+        unbind();
+        vao.unbind();
+    }
+
+    public void uploadVertexAttributeData(VAO vao, float[] data, int attributeIndex, int singleVertexAttributeLength,
+                int singleVertexSizeInBytes, int singleVertexAttributeStartingOffsetSizeInBytes, BufferDataType bufferDataType) {
+        vao.bind();
+        bind();
+        glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(data), bufferDataType.getValue());
+        vao.updateVertexAttributePointer(attributeIndex, singleVertexAttributeLength, singleVertexSizeInBytes, singleVertexAttributeStartingOffsetSizeInBytes);
         unbind();
         vao.unbind();
     }

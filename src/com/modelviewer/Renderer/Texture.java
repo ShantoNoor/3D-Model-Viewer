@@ -10,6 +10,7 @@ import java.nio.IntBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL33.glBindSampler;
 import static org.lwjgl.stb.STBImage.*;
 
 public class Texture {
@@ -69,7 +70,7 @@ public class Texture {
             System.exit(-1);
         }
 
-        shaderProgram.upload(shaderSamplerName, textureSlot);
+        shaderProgram.safeUpload(shaderSamplerName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, id);
     }

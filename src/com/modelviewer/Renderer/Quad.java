@@ -1,20 +1,14 @@
 package com.modelviewer.Renderer;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
-import com.modelviewer.Utils.Utils;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Quad {
-    private float val = 1.0f;
+    private VAO vao;
+    private VBO vbo;
+    private IBO ibo;
+
+    private float val = 2.0f;
     private float[] vertexArray = {
              // positions
              val, -val, 0.0f,
@@ -27,34 +21,25 @@ public class Quad {
             0, 1, 3
     };
 
-    private int vaoID, vboID, eboID;
-
     public Quad() {
-        vaoID = glGenVertexArrays();
-        glBindVertexArray(vaoID);
+        vao = new VAO();
+        vbo = new VBO();
+        ibo = new IBO();
 
-        vboID = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vaoID);
-        glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(vertexArray), GL_STATIC_DRAW);
+        int positionLenght = 3;
+        int vertexSize = positionLenght * 4;
 
-        eboID = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Utils.convertIntArrayToIntBuffer(elementArray), GL_STATIC_DRAW);
-
-        int positionSize = 3;
-        int vertexSize = positionSize * 4;
-
-        glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSize, 0);
-        glEnableVertexAttribArray(0);
+        ibo.uploadIndicesData(vao, elementArray, BufferDataType.STATIC);
+        vbo.uploadVertexAttributeData(vao, vertexArray, 0, positionLenght, vertexSize,
+                0, BufferDataType.STATIC);
     }
 
     public void render(ShaderProgram shaderProgram) {
         shaderProgram.bind();
-        glBindVertexArray(vaoID);
-        glEnableVertexAttribArray(0);
-        glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);
-        glBindVertexArray(0);
-        shaderProgram.unbind();
+        vao.bind();
+        ibo.bind();
+        glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_INT, 0);
+        ibo.unbind();
+        vao.unbind();
     }
 }

@@ -109,6 +109,17 @@ public class ShaderProgram {
         glUniform1f(varLocation, value);
     }
 
+    public void safeUpload(String varName, int value) {
+        bind();
+        upload(varName, value);
+        unbind();
+    }
+
+    public void upload(String varName, int value) {
+        int varLocation = glGetUniformLocation(id, varName);
+        glUniform1i(varLocation, value);
+    }
+
     public void clear() {
         glDeleteProgram(id);
     }

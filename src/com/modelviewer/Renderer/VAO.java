@@ -9,17 +9,19 @@ import static org.lwjgl.opengl.GL30.*;
 public class VAO {
     private int id;
     private ArrayList<Integer> vertexAttributes;
+    private ArrayList<VBO> vbos;
 
     public VAO() {
         id = glGenVertexArrays();
         vertexAttributes = new ArrayList<Integer>();
+        vbos = new ArrayList<>();
     }
 
     public void bind() {
+        glBindVertexArray(id);
         for(int i = 0; i < vertexAttributes.size(); ++i) {
             enableVertexAttribute(vertexAttributes.get(i));
         }
-        glBindVertexArray(id);
     }
 
     public void unbind() {
@@ -37,12 +39,12 @@ public class VAO {
         glDisableVertexAttribArray(attributeIndex);
     }
 
-    public void updateVertexAttributePointer(int attributeIndex, int singleVertexAttributeSize,
-                                             int vertexAttributeStartOffset, int nextVertexAttributeOffsetSize) {
+    public void updateVertexAttributePointer(int attributeIndex, int singleVertexAttributeLength,
+                                             int singleVertexSizeInBytes, int singleVertexAttributeStartingOffsetSizeInBytes) {
         addVertexAttribute(attributeIndex);
         enableVertexAttribute(attributeIndex);
-        glVertexAttribPointer(attributeIndex, singleVertexAttributeSize, GL_FLOAT, false,
-                vertexAttributeStartOffset, nextVertexAttributeOffsetSize);
+        glVertexAttribPointer(attributeIndex, singleVertexAttributeLength, GL_FLOAT, false,
+                singleVertexSizeInBytes, singleVertexAttributeStartingOffsetSizeInBytes);
     }
 
     public int getId() {
