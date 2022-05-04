@@ -1,6 +1,6 @@
 package com.modelviewer.Renderer.Mesh;
 
-import com.modelviewer.Renderer.Shader;
+import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -158,19 +158,19 @@ public class Model {
 
     // private void clear() {}
 
-    public void render(Shader shader) {
-        shader.activate();
+    public void render(ShaderProgram shaderProgram) {
+        shaderProgram.bind();
         glBindVertexArray(vaoID);
 
         if(modelSuccessfullyLoaded) {
             for (int i = 0; i < meshes.length; ++i) {
-                shader.uploadN("modelTransform", meshes[i].modelTransform);
+                shaderProgram.upload("modelTransform", meshes[i].modelTransform);
                 glDrawElementsBaseVertex(GL_TRIANGLES, meshes[i].numberOfIndices, GL_UNSIGNED_INT, meshes[i].baseIndex * 4, meshes[i].baseVertex);
             }
         }
 
         glBindVertexArray(0);
-        shader.deactivate();
+        shaderProgram.unbind();
     }
 
     private boolean initFromScene(AIScene pScene, String filePath) {

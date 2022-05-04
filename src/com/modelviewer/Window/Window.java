@@ -2,9 +2,9 @@ package com.modelviewer.Window;
 
 import com.modelviewer.Camera.Camera;
 import com.modelviewer.Renderer.Mesh.Model;
-import com.modelviewer.Renderer.Shader;
-import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Renderer.Quad;
+import com.modelviewer.Renderer.Shader.ShaderProgram;
+import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Renderer.VAO;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
@@ -27,9 +27,15 @@ public class Window {
     private int width, height;
     private String title;
     private long glfwWindow;
+
     private boolean showFps;
     private Vector4f clearColor;
     private int windowFlags;
+
+    private float aspectRatio;
+    private float fieldOfView;
+    private float farPlane;
+    private float nearPlane;
     private Matrix4f projectionMatrix;
 
     private static Window window = null;
@@ -41,9 +47,11 @@ public class Window {
         this.showFps = true;
         this.clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
         this.windowFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
-
-        this.projectionMatrix = new Matrix4f().identity();
-        projectionMatrix.perspective(45 * Constants.TO_RADIAN, ((float) width / (float) height), 0.1f, 100.0f, projectionMatrix);
+        this.fieldOfView = 45;
+        this.nearPlane = 0.1f;
+        this.farPlane = 100.0f;
+        this.aspectRatio = (float) width / (float) height;
+        this.projectionMatrix = new Matrix4f().perspective(fieldOfView * Constants.TO_RADIAN, aspectRatio, nearPlane, farPlane);
     }
 
     public static Window get() {
@@ -127,13 +135,13 @@ public class Window {
 
         Camera camera = new Camera();
 
-        Shader shader = new Shader("shaders/default.vs.glsl", "shaders/default.fs.glsl");
-        shader.compile();
-        shader.upload("projection", projectionMatrix);
+        ShaderProgram shaderProgram = new ShaderProgram("shaders/default.vs.glsl", "shaders/default.fs.glsl");
+        shaderProgram.compile();
+        shaderProgram.safeUpload("projection", projectionMatrix);
 
         Quad quad = new Quad();
-        Shader quadShader = new Shader("shaders/quad.vs.glsl", "shaders/quad.fs.glsl");
-        quadShader.compile();
+        ShaderProgram quadShaderProgram = new ShaderProgram("shaders/quad.vs.glsl", "shaders/quad.fs.glsl");
+        quadShaderProgram.compile();
 
         Model model = new Model();
         model.loadMesh("TestModels/pistol/source/pistol.fbx");
@@ -160,24 +168,15 @@ public class Window {
             camera.mouseUpdate(glfwWindow, width, height);
             camera.keyboardUpdate(dt);
 
-            shader.upload("view", camera.getViewMatrix());
-            shader.upload("transform", model.getTransform());
-            shader.upload("camPos", camera.getPosition());
-            shader.upload("lightF", camera.getViewDirection());
+            shaderProgram.safeUpload("view", camera.getViewMatrix());
+            shaderProgram.safeUpload("transform", model.getTransform());
+            shaderProgram.safeUpload("camPos", camera.getPosition());
+            shaderProgram.safeUpload("lightF", camera.getViewDirection());
 
-            texture.bind(shader, "tex", 0);
-            texture.bind(shader, "nor", 1);
+//            texture.bind(shaderProgram, "tex", 0);
+//            texture.bind(shaderProgram, "nor", 1);
 
-//            vao.bind();
-//            glLineWidth(4);
-//            glBegin(GL_LINE);
-//            glVertex3d(-1000, 0, 0);
-//            glVertex3d(1000, 0, 0);
-//            glEnd();
-//            vao.unbind();
-
-//            quad.render(quadShader);
-            model.render(shader);
+            model.render(shaderProgram);
 
             glfwSwapBuffers(glfwWindow);
 

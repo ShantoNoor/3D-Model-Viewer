@@ -1,4 +1,5 @@
 package com.modelviewer.Renderer;
+import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Utils.Utils;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -47,13 +48,13 @@ public class Quad {
         glEnableVertexAttribArray(0);
     }
 
-    public void render(Shader shader) {
-        shader.activate();
+    public void render(ShaderProgram shaderProgram) {
+        shaderProgram.bind();
         glBindVertexArray(vaoID);
         glEnableVertexAttribArray(0);
         glDrawElements(GL_TRIANGLES, elementArray.length, GL_UNSIGNED_INT, 0);
         glDisableVertexAttribArray(0);
         glBindVertexArray(0);
-        shader.deactivate();
+        shaderProgram.unbind();
     }
 }

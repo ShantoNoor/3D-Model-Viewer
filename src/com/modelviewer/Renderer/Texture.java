@@ -1,5 +1,6 @@
 package com.modelviewer.Renderer;
 
+import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Utils.Utils;
 import org.lwjgl.BufferUtils;
 
@@ -12,30 +13,16 @@ import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.stb.STBImage.*;
 
 public class Texture {
+    private int id;
     private String filepath;
-    private transient int texID;
     private int width, height;
-
-//    public Texture(int width, int height) {
-//        this.filepath = "Generated";
-//
-//        // Generate texture on GPU
-//        texID = glGenTextures();
-//        glBindTexture(GL_TEXTURE_2D, texID);
-//
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
-//                0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-//    }
 
     public void init(String filepath) {
         this.filepath = filepath;
 
         // Generate texture on GPU
-        texID = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, texID);
+        id = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, id);
 
         // Set texture parameters
         // Repeat image in both directions
@@ -67,6 +54,7 @@ public class Texture {
                         0, GL_RGBA, GL_UNSIGNED_BYTE, image);
             } else {
                 System.out.println("Error: (Texture) Unknown number of channesl '" + channels.get(0) + "'");
+                System.exit(-1);
             }
         } else {
             System.out.println("Error: (Texture) Could not load image '" + filepath + "'");
@@ -75,15 +63,15 @@ public class Texture {
         stbi_image_free(image);
     }
 
-    public void bind(Shader shader, String shaderSamplerName, int textureSlot) {
+    public void bind(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {
         if(textureSlot >= Utils.queryNumberOfMaxTextureUnits()) {
-            System.out.println("Texture slot number is greater than max texture units number.");
+            System.out.println("Texture slot number is greater than max texture units number of this system.");
             System.exit(-1);
         }
 
-        shader.upload(shaderSamplerName, textureSlot);
+        shaderProgram.upload(shaderSamplerName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
-        glBindTexture(GL_TEXTURE_2D, texID);
+        glBindTexture(GL_TEXTURE_2D, id);
     }
 
     public void unbind() {
@@ -103,6 +91,10 @@ public class Texture {
     }
 
     public int getId() {
-        return texID;
+        return id;
     }
-}
+
+    public void clear() {
+        glDeleteTextures(id);
+    }
+ }

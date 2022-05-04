@@ -6,7 +6,9 @@ import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL15.*;
 
-public class VBO extends OpenGLObject {
+public class VBO {
+    private int id;
+
     public VBO() {
         id = glGenBuffers();
     }

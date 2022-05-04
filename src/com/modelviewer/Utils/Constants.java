@@ -11,4 +11,10 @@ public class Constants {
     public static final Vector3f Y_AXIS = new Vector3f(0.0f, 1.0f, 0.0f);
     public static final Vector3f Z_AXIS = new Vector3f(0.0f, 0.0f, 1.0f);
     public static final Vector3f UP = X_AXIS;
+
+    public static int positionSize = 3;
+    public static int normalSize = 3;
+    public static int bitangentSize = 3;
+    public static int colorSize = 3;
+    public static int texCoordSize = 2;
 }

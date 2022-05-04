@@ -6,7 +6,9 @@ import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL15.*;
 
-public class IBO extends OpenGLObject {
+public class IBO {
+    private int id;
+
     public IBO() {
         id = glGenBuffers();
     }
