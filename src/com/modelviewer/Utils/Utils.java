@@ -9,6 +9,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static org.lwjgl.opengl.GL11.glGetError;
 import static org.lwjgl.opengl.GL11.glGetIntegerv;
 import static org.lwjgl.opengl.GL20.GL_MAX_TEXTURE_IMAGE_UNITS;
 
@@ -128,5 +129,9 @@ public class Utils {
         IntBuffer maximumTextureUnits = BufferUtils.createIntBuffer(1);
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, maximumTextureUnits);
         return maximumTextureUnits.get();
+    }
+
+    public static void printOpenGLError() {
+        System.out.println(glGetError());
     }
 }

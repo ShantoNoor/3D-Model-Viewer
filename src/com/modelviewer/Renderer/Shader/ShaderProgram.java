@@ -6,6 +6,7 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL20.*;
@@ -15,6 +16,7 @@ import static org.lwjgl.opengl.GL20.glUniform3fv;
 public class ShaderProgram {
     private int id;
     private ArrayList<Shader> shaders = new ArrayList<>();
+    private HashMap<String, Integer> varLocations = new HashMap<>();
 
     public ShaderProgram() { }
 
@@ -71,6 +73,15 @@ public class ShaderProgram {
         glUseProgram(0);
     }
 
+    public int getVarLocation(String varName) {
+        if(varLocations.containsKey(varName))
+            return varLocations.get(varName);
+
+        int varLocation = glGetUniformLocation(id, varName);
+        varLocations.put(varName, varLocation);
+        return varLocation;
+    }
+
     public void safeUpload(String varName, Matrix4f mat4) {
         bind();
         upload(varName, mat4);
@@ -78,10 +89,9 @@ public class ShaderProgram {
     }
 
     public void upload(String varName, Matrix4f mat4) {
-        int varLocation = glGetUniformLocation(id, varName);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
         mat4.get(buffer);
-        glUniformMatrix4fv(varLocation, false, buffer);
+        glUniformMatrix4fv(getVarLocation(varName), false, buffer);
     }
 
     public void safeUpload(String varName, Vector3f vec3) {
@@ -91,22 +101,19 @@ public class ShaderProgram {
     }
 
     public void upload(String varName, Vector3f vec3) {
-        int varLocation = glGetUniformLocation(id, varName);
         FloatBuffer buffer = BufferUtils.createFloatBuffer(3);
         vec3.get(buffer);
-        glUniform3fv(varLocation, buffer);
+        glUniform3fv(getVarLocation(varName), buffer);
     }
 
     public void safeUpload(String varName, float value) {
         bind();
-        int varLocation = glGetUniformLocation(id, varName);
-        glUniform1f(varLocation, value);
+        upload(varName, value);
         unbind();
     }
 
     public void upload(String varName, float value) {
-        int varLocation = glGetUniformLocation(id, varName);
-        glUniform1f(varLocation, value);
+        glUniform1f(getVarLocation(varName), value);
     }
 
     public void safeUpload(String varName, int value) {
@@ -116,12 +123,12 @@ public class ShaderProgram {
     }
 
     public void upload(String varName, int value) {
-        int varLocation = glGetUniformLocation(id, varName);
-        glUniform1i(varLocation, value);
+        glUniform1i(getVarLocation(varName), value);
     }
 
     public void clear() {
         glDeleteProgram(id);
+        varLocations.clear();
     }
 }
 

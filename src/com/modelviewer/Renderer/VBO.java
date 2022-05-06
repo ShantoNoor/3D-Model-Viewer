@@ -27,6 +27,10 @@ public class VBO {
         vao.unbind();
     }
 
+    public void uploadVertexAttributeData(VAO vao, ArrayList<Float> data, int attributeIndex, int singleVertexAttributeLength, BufferDataType bufferDataType) {
+        uploadVertexAttributeData(vao, data, attributeIndex, singleVertexAttributeLength, 0, 0, bufferDataType);
+    }
+
     public void uploadVertexAttributeData(VAO vao, float[] data, int attributeIndex, int singleVertexAttributeLength,
                 int singleVertexSizeInBytes, int singleVertexAttributeStartingOffsetSizeInBytes, BufferDataType bufferDataType) {
         vao.bind();
@@ -35,6 +39,10 @@ public class VBO {
         vao.updateVertexAttributePointer(attributeIndex, singleVertexAttributeLength, singleVertexSizeInBytes, singleVertexAttributeStartingOffsetSizeInBytes);
         unbind();
         vao.unbind();
+    }
+
+    public void uploadVertexAttributeData(VAO vao, float[] data, int attributeIndex, int singleVertexAttributeLength, BufferDataType bufferDataType) {
+        uploadVertexAttributeData(vao, data, attributeIndex, singleVertexAttributeLength, 0, 0, bufferDataType);
     }
 
     public void unbind() {

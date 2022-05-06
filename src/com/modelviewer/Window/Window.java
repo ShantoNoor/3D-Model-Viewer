@@ -6,9 +6,12 @@ import com.modelviewer.Window.Input.KeyListener;
 import com.modelviewer.Window.Input.MouseListener;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+
+import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -17,33 +20,40 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 abstract public class Window {
-    protected String title;
+    private String title;
     protected int width, height;
     protected long glfwWindow;
 
-    protected boolean showFps;
-    protected Vector4f clearColor;
-    protected int windowFlags;
+    private boolean showFps;
+    private Vector4f clearColor;
+    private int windowFlags;
 
-    protected float aspectRatio;
-    protected float fieldOfView;
-    protected float farPlane;
-    protected float nearPlane;
-
+    private float fieldOfView;
+    private float farPlane;
+    private float nearPlane;
     protected Matrix4f projectionMatrix;
 
-    public Window() {
-        this.height = 720;
-        this.width = 1280;
-        this.title = "3D Model Viewer";
+    public Window(int width, int height, String title) {
+        this.height = height;
+        this.width = width;
+
+        this.title = title;
         this.showFps = true;
+
         this.clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
         this.windowFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+
         this.fieldOfView = 45;
         this.nearPlane = 0.1f;
         this.farPlane = 100.0f;
-        this.aspectRatio = (float) width / (float) height;
-        this.projectionMatrix = new Matrix4f().perspective(fieldOfView * Constants.TO_RADIAN, aspectRatio, nearPlane, farPlane);
+
+        updateProjectionMatrix();
+    }
+
+
+    private void updateProjectionMatrix() {
+        float aspectRatio = (float) width / (float) height;
+        projectionMatrix = new Matrix4f().perspective(fieldOfView * Constants.TO_RADIAN, aspectRatio, nearPlane, farPlane);
     }
 
     public void init() {
@@ -92,13 +102,20 @@ abstract public class Window {
         GL.createCapabilities();
 
         //Enabling Clock Wise Face Culling
-//        glEnable(GL_CULL_FACE);
-//        glCullFace(GL_CW);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_CW);
 
         // Enabling Depth Test
         glEnable(GL_DEPTH_TEST);
 
         System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
+    }
+
+    public void run() {
+        init();
+        setup();
+        mainLoop();
+        clear();
     }
 
     public void mainLoop() {
@@ -111,6 +128,8 @@ abstract public class Window {
 
             // Poll events
             glfwPollEvents();
+            handleResize();
+
 
             glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
             glClear(windowFlags);
@@ -138,4 +157,82 @@ abstract public class Window {
 
     abstract public void loop(float dt);
     abstract public void setup();
+
+    private void handleResize() {
+        IntBuffer windowWidth = BufferUtils.createIntBuffer(1);
+        IntBuffer windowHeight = BufferUtils.createIntBuffer(1);
+        glfwGetWindowSize(glfwWindow, windowWidth, windowHeight);
+        width = windowWidth.get();
+        height = windowHeight.get();
+        updateProjectionMatrix();
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public long getGlfwWindow() {
+        return glfwWindow;
+    }
+
+    public float getFieldOfView() {
+        return fieldOfView;
+    }
+
+    public float getFarPlane() {
+        return farPlane;
+    }
+
+    public float getNearPlane() {
+        return nearPlane;
+    }
+
+    public Matrix4f getProjectionMatrix() {
+        return projectionMatrix;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+        updateProjectionMatrix();
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+        updateProjectionMatrix();
+    }
+
+    public void setShowFps(boolean showFps) {
+        this.showFps = showFps;
+    }
+
+    public void setFieldOfView(float fieldOfView) {
+        this.fieldOfView = fieldOfView;
+        updateProjectionMatrix();
+    }
+
+    public void setFarPlane(float farPlane) {
+        this.farPlane = farPlane;
+        updateProjectionMatrix();
+    }
+
+    public void setNearPlane(float nearPlane) {
+        this.nearPlane = nearPlane;
+        updateProjectionMatrix();
+    }
+
+    public void setClearColor(Vector4f clearColor) {
+        this.clearColor = clearColor;
+    }
 }

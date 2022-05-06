@@ -1,24 +1,23 @@
 package com.modelviewer.Renderer.Mesh;
 
+import com.modelviewer.Renderer.*;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Utils.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL32.glDrawElementsBaseVertex;
 
 public class Model {
     private MeshInfo[] meshes;
-    private Material[] materials;
+    private Texture[] textures;
 
     private float[] positions;
     private float[] normals;
@@ -26,15 +25,15 @@ public class Model {
     private float[] colors;
     private int[] indices;
 
-    private static final int INDEX_BUFFER = 0;
-    private static final int POSITION_BUFFER = 1;
-    private static final int TEX_COORD_BUFFER = 2;
-    private static final int NORMAL_BUFFER = 3;
-    private static final int COLOR_BUFFER = 4;
-    private static final int NUMBER_OF_BUFFER = 5;
+    private static final int POSITION_BUFFER = 0;
+    private static final int TEX_COORD_BUFFER = 1;
+    private static final int NORMAL_BUFFER = 2;
+    private static final int COLOR_BUFFER = 3;
+    private static final int NUMBER_OF_BUFFER = 4;
 
-    private int vaoID;
-    private int[] bufferIDs = new int[NUMBER_OF_BUFFER];
+    private VAO vao = new VAO();
+    private VBO[] vbos = new VBO[NUMBER_OF_BUFFER];
+    private IBO ibo = new IBO();
 
     private int numberOfVertices = 0, numberOfIndices = 0;
 
@@ -42,58 +41,71 @@ public class Model {
 
     private Vector3f min = new Vector3f(Float.MAX_VALUE);
     private Vector3f max = new Vector3f(Float.MIN_VALUE);
-
     private Vector3f origin = new Vector3f(0.0f);
-
     private float distance;
     private float minDistance = 15.0f;
     private float maxDistance = 30.0f;
 
     private Matrix4f transform = new Matrix4f();
 
-
     public Model() { }
 
     public boolean loadMesh(String filePath) {
-        vaoID = glGenVertexArrays();
-        glBindVertexArray(vaoID);
-
-        for(int i = 0; i < bufferIDs.length; ++i) {
-            bufferIDs[i] = glGenBuffers();
-        }
-
-        boolean ret = true;
-
         int importFlags = Assimp.aiProcess_CalcTangentSpace
-                | Assimp.aiProcess_GenSmoothNormals
-                | Assimp.aiProcess_JoinIdenticalVertices
-                | Assimp.aiProcess_ImproveCacheLocality
-                | Assimp.aiProcess_LimitBoneWeights
-                | Assimp.aiProcess_RemoveRedundantMaterials
-                | Assimp.aiProcess_SplitLargeMeshes
-                | Assimp.aiProcess_Triangulate
-                | Assimp.aiProcess_GenUVCoords
-                | Assimp.aiProcess_SortByPType
-                | Assimp.aiProcess_GenBoundingBoxes
-                ;
+                            | Assimp.aiProcess_GenSmoothNormals
+                            | Assimp.aiProcess_JoinIdenticalVertices
+                            | Assimp.aiProcess_ImproveCacheLocality
+                            | Assimp.aiProcess_LimitBoneWeights
+                            | Assimp.aiProcess_RemoveRedundantMaterials
+                            | Assimp.aiProcess_SplitLargeMeshes
+                            | Assimp.aiProcess_Triangulate
+                            | Assimp.aiProcess_GenUVCoords
+                            | Assimp.aiProcess_SortByPType
+                            | Assimp.aiProcess_GenBoundingBoxes
+                            ;
 
         AIScene pScene = Assimp.aiImportFile(filePath, importFlags);
 
         if(pScene != null) {
-            ret = initFromScene(pScene, filePath);
+            modelSuccessfullyLoaded = initFromScene(pScene, filePath);
             processMeshTransform(pScene.mRootNode(), new Matrix4f());
             adjustTransform();
         } else {
-            ret = false;
+            modelSuccessfullyLoaded = false;
             System.out.println("Error parsing: " + filePath + " " + Assimp.aiGetErrorString().toString());
             System.exit(-1);
         }
 
-        glBindVertexArray(0);
+        printAllMaterials(pScene);
 
-        modelSuccessfullyLoaded = ret;
+        return modelSuccessfullyLoaded;
+    }
 
-        return ret;
+    private void printAllMaterials(AIScene scene) {
+        PointerBuffer materials = scene.mMaterials();
+        for (int i = 0; i < scene.mNumMaterials(); ++i) {
+            AIMaterial material = AIMaterial.create(materials.get(i));
+
+            PointerBuffer materialProperties = material.mProperties();
+
+            for (int j = 0; j < material.mNumProperties(); ++j) {
+                AIMaterialProperty materialProperty = AIMaterialProperty.create(materialProperties.get(j));
+
+                AIString aiKey = materialProperty.mKey();
+//                System.out.println(i + " " + j + " mKey: " + aiKey.dataString());
+//                System.out.println(i + " " + j + " mType: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mType()));
+//
+//                System.out.println(i + " " + j + " mSemantic: " + materialProperty.mSemantic());
+//                System.out.println(i + " " + j + " mIndex: " + materialProperty.mIndex());
+//                System.out.println(i + " " + j + " mDataLength: " + materialProperty.mDataLength());
+//                System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
+
+                if(materialProperty.mSemantic() > 0) {
+                    System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
+                    System.out.println(i + " " + j + " mSemantic: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mSemantic()));
+                }
+            }
+        }
     }
 
     private void adjustTransform() {
@@ -156,27 +168,26 @@ public class Model {
         if(max.z < temp_max.z) max.z = temp_max.z;
     }
 
-    // private void clear() {}
-
     public void render(ShaderProgram shaderProgram) {
         shaderProgram.bind();
-        glBindVertexArray(vaoID);
+        vao.bind();
+        ibo.bind();
 
         if(modelSuccessfullyLoaded) {
             for (int i = 0; i < meshes.length; ++i) {
-                shaderProgram.upload("modelTransform", meshes[i].modelTransform);
+                shaderProgram.upload("mesh", meshes[i].modelTransform);
                 glDrawElementsBaseVertex(GL_TRIANGLES, meshes[i].numberOfIndices, GL_UNSIGNED_INT, meshes[i].baseIndex * 4, meshes[i].baseVertex);
             }
         }
 
-        glBindVertexArray(0);
+        ibo.unbind();
+        vao.unbind();
         shaderProgram.unbind();
     }
 
     private boolean initFromScene(AIScene pScene, String filePath) {
-
         meshes = new MeshInfo[pScene.mNumMeshes()];
-        materials = new Material[pScene.mNumMaterials()];
+        textures = new Texture[pScene.mNumMaterials()];
 
         countVerticesAndIndices(pScene);
         reserveSpace();
@@ -222,6 +233,8 @@ public class Model {
 
         for (int j = 0 ; j < meshes.length ; j++) {
             AIMesh mesh = AIMesh.create(buffer.get(j));
+
+            System.out.println("Mesh " + j + ": " + mesh.mName().dataString() + ": material index: " + mesh.mMaterialIndex());
 
             AIVector3D.Buffer vertexPositions = mesh.mVertices();
             for(int i = 0; i < vertexPositions.limit(); ++i) {
@@ -286,32 +299,25 @@ public class Model {
     // private boolean initMaterials(AIScene pScene, String filePath) {}
 
     private void loadBuffers() {
-        glBindVertexArray(vaoID);
+        vao.bind();
+        for(int i = 0; i < vbos.length; ++i) {
+            vbos[i] = new VBO();
+        }
 
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[POSITION_BUFFER]);
-        glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(positions), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+        vbos[POSITION_BUFFER].uploadVertexAttributeData(vao, positions, POSITION_BUFFER, 3, BufferDataType.STATIC);
+        vbos[TEX_COORD_BUFFER].uploadVertexAttributeData(vao, texCords, TEX_COORD_BUFFER, 2, BufferDataType.STATIC);
+        vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals, NORMAL_BUFFER, 3, BufferDataType.STATIC);
+        vbos[COLOR_BUFFER].uploadVertexAttributeData(vao, colors, COLOR_BUFFER, 4, BufferDataType.STATIC);
 
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[TEX_COORD_BUFFER]);
-        glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(texCords), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1,  2, GL_FLOAT, false, 0, 0);
+        ibo.uploadIndicesData(vao, indices, BufferDataType.STATIC);
+        vao.unbind();
+    }
 
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[NORMAL_BUFFER]);
-        glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(normals), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ARRAY_BUFFER, bufferIDs[COLOR_BUFFER]);
-        glBufferData(GL_ARRAY_BUFFER, Utils.convertFloatArrayToFloatBuffer(colors), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 4, GL_FLOAT, false, 0, 0);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIDs[INDEX_BUFFER]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, Utils.convertIntArrayToIntBuffer(indices), GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
+    public void clear() {
+        vao.clear();
+        for(int i = 0; i < vbos.length; ++i) {
+            vbos[i].clear();
+        }
     }
 
     public Matrix4f getTransform() {
