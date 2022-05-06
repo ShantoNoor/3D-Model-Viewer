@@ -43,6 +43,7 @@ public class MeshTester extends Window {
 //        model.loadMesh("TestModels/Drawing7.stl");
 //        model.loadMesh("TestModels/cube.obj");
 //        model.loadMesh("TestModels/plane.stl");
+//        model.loadMesh("/Users/shantonoor/IdeaProjects/3D Model Viewer/TestModels/astronaut/source/Walking astronaut.glb");
 
         camera = new Camera();
         camera.setPosition(new Vector3f(0.0f, 0.0f, model.getDistance()));

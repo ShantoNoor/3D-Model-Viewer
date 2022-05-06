@@ -10,6 +10,7 @@ import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -78,6 +79,8 @@ public class Model {
 
         printAllMaterials(pScene);
 
+        System.out.println(pScene.mFlags());
+
         return modelSuccessfullyLoaded;
     }
 
@@ -87,24 +90,41 @@ public class Model {
             AIMaterial material = AIMaterial.create(materials.get(i));
 
             PointerBuffer materialProperties = material.mProperties();
+            AIMaterialProperty materialProperty = AIMaterialProperty.create(materialProperties.get(i));
 
-            for (int j = 0; j < material.mNumProperties(); ++j) {
-                AIMaterialProperty materialProperty = AIMaterialProperty.create(materialProperties.get(j));
-
-                AIString aiKey = materialProperty.mKey();
-//                System.out.println(i + " " + j + " mKey: " + aiKey.dataString());
-//                System.out.println(i + " " + j + " mType: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mType()));
+//            for (int j = 0; j < material.mNumProperties(); ++j) {
+//                AIMaterialProperty materialProperty = AIMaterialProperty.create(materialProperties.get(j));
 //
-//                System.out.println(i + " " + j + " mSemantic: " + materialProperty.mSemantic());
-//                System.out.println(i + " " + j + " mIndex: " + materialProperty.mIndex());
-//                System.out.println(i + " " + j + " mDataLength: " + materialProperty.mDataLength());
-//                System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
+//                AIString aiKey = materialProperty.mKey();
+////                System.out.println(i + " " + j + " mKey: " + aiKey.dataString());
+////                System.out.println(i + " " + j + " mType: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mType()));
+////
+////                System.out.println(i + " " + j + " mSemantic: " + materialProperty.mSemantic());
+////                System.out.println(i + " " + j + " mIndex: " + materialProperty.mIndex());
+////                System.out.println(i + " " + j + " mDataLength: " + materialProperty.mDataLength());
+////                System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
+//
+//                if(materialProperty.mSemantic() > 0) {
+//                    System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
+//                    System.out.println(i + " " + j + " mSemantic: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mSemantic()));
+//                }
+//            }
 
-                if(materialProperty.mSemantic() > 0) {
-                    System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
-                    System.out.println(i + " " + j + " mSemantic: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mSemantic()));
+            AIString path;
+            for(int j = 1; j < 22; ++j) {
+                for (int k = 0; k < 10; ++k) {
+                    path = AIString.create();
+                    Assimp.aiGetMaterialTexture(material, j, k, path, (IntBuffer) null, null, null, null, null, null);
+                    if(path.dataString() != "") System.out.println(Assimp.TextureTypeToString(j) + "( material: "+ i + ", index: " + k + " ): " + path.dataString());
                 }
             }
+        }
+
+        PointerBuffer textures = scene.mTextures();
+        for(int i = 0; i < scene.mNumTextures(); ++i) {
+            AITexture texture = AITexture.create(textures.get(i));
+            System.out.println(texture.mFilename().dataString());
+            System.out.println(texture.mWidth() + " " + texture.mHeight());
         }
     }
 
