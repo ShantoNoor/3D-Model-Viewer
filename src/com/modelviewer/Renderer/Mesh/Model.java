@@ -7,10 +7,12 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -26,11 +28,15 @@ public class Model {
     private float[] colors;
     private int[] indices;
 
+    private FloatBuffer tangents, bitangents;
+
     private static final int POSITION_BUFFER = 0;
     private static final int TEX_COORD_BUFFER = 1;
     private static final int NORMAL_BUFFER = 2;
     private static final int COLOR_BUFFER = 3;
-    private static final int NUMBER_OF_BUFFER = 4;
+    private static final int TANGENT_BUFFER = 4;
+    private static final int BITANGENT_BUFFER = 5;
+    private static final int NUMBER_OF_BUFFER = 6;
 
     private VAO vao = new VAO();
     private VBO[] vbos = new VBO[NUMBER_OF_BUFFER];
@@ -77,55 +83,89 @@ public class Model {
             System.exit(-1);
         }
 
-        printAllMaterials(pScene);
-
-        System.out.println(pScene.mFlags());
+         printAllMaterials(pScene);
 
         return modelSuccessfullyLoaded;
     }
 
     private void printAllMaterials(AIScene scene) {
         PointerBuffer materials = scene.mMaterials();
+
         for (int i = 0; i < scene.mNumMaterials(); ++i) {
             AIMaterial material = AIMaterial.create(materials.get(i));
 
             PointerBuffer materialProperties = material.mProperties();
-            AIMaterialProperty materialProperty = AIMaterialProperty.create(materialProperties.get(i));
+            for (int j = 0; j < material.mNumProperties(); ++j) {
+                AIMaterialProperty property = AIMaterialProperty.create(materialProperties.get(j));
+                String key = property.mKey().dataString();
 
-//            for (int j = 0; j < material.mNumProperties(); ++j) {
-//                AIMaterialProperty materialProperty = AIMaterialProperty.create(materialProperties.get(j));
-//
-//                AIString aiKey = materialProperty.mKey();
-////                System.out.println(i + " " + j + " mKey: " + aiKey.dataString());
-////                System.out.println(i + " " + j + " mType: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mType()));
-////
-////                System.out.println(i + " " + j + " mSemantic: " + materialProperty.mSemantic());
-////                System.out.println(i + " " + j + " mIndex: " + materialProperty.mIndex());
-////                System.out.println(i + " " + j + " mDataLength: " + materialProperty.mDataLength());
-////                System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
-//
-//                if(materialProperty.mSemantic() > 0) {
-//                    System.out.println(i + " " + j + " mData: " + materialProperty.mData().asCharBuffer().toString());
-//                    System.out.println(i + " " + j + " mSemantic: " + materialProperty.mType() + " " + Assimp.TextureTypeToString(materialProperty.mSemantic()));
+                System.out.println(key);
+
+                if(key.equals(Assimp.AI_MATKEY_NAME)) {
+                    System.out.println(Utils.convertByteBufferToString(property.mData()));
+                }
+
+                if(key.equals(Assimp._AI_MATKEY_TEXTURE_BASE)) {
+                    System.out.println(Assimp.TextureTypeToString(property.mSemantic()) + ": " + Utils.convertByteBufferToString(property.mData()));
+                }
+
+                if(key.equals(Assimp.ai_AI_MATKEY_GLTF_MAPPINGFILTER_MAG_BASE)) {
+                    System.out.println(Utils.convertByteBufferToString(property.mData()));
+                }
+
+//                System.out.println("Material: (" + i + ", " + j + "): ");
+                if(key.equals(Assimp.AI_MATKEY_GLOSSINESS_FACTOR)) {
+                    System.out.println("GLOSSINESS_FACTOR: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_OPACITY)) {
+                    System.out.println("OPACITY: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_REFLECTIVITY)) {
+                    System.out.println("REFLECTIVITY: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_CLEARCOAT_FACTOR)) {
+                    System.out.println("CLEARCOAT_FACTOR: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_METALLIC_FACTOR)) {
+                    System.out.println("METALLIC_FACTOR: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_EMISSIVE_INTENSITY)) {
+                    System.out.println("EMISSIVE_INTENSITY: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_ROUGHNESS_FACTOR)) {
+                    System.out.println("ROUGHNESS_FACTOR: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_SHININESS)) {
+                    System.out.println("SHININESS: " + property.mData().getFloat());
+                } else if(key.equals(Assimp.AI_MATKEY_USE_EMISSIVE_MAP)) {
+                    System.out.println("EMISSIVE_MAP: ");
+//                    System.out.println("EMISSIVE_MAP: " + property.mData().getChar());
+                } else if(key.equals(Assimp.AI_MATKEY_USE_COLOR_MAP)) {
+                    System.out.println("COLOR_MAP: ");
+//                    System.out.println("COLOR_MAP: " + property.mData().getChar());
+                } else if(key.equals(Assimp.AI_MATKEY_USE_ROUGHNESS_MAP)) {
+                    System.out.println("ROUGHNESS_MAP: ");
+//                    System.out.println("ROUGHNESS_MAP: " + property.mData().getChar());
+                } else if(key.equals(Assimp.AI_MATKEY_USE_AO_MAP)) {
+                    System.out.println("AO_MAP: ");
+//                    System.out.println("AO_MAP: " + property.mData().getChar());
+                } else if(key.equals(Assimp.AI_MATKEY_USE_METALLIC_MAP)) {
+                    System.out.println("METALLIC_MAP: ");
+//                    System.out.println("METALLIC_MAP: " + property.mData().getChar());
+                }
+//                System.out.println();
+
+            }
+
+//            AIString path;
+//            for(int j = 1; j < 22; ++j) {
+//                for (int k = 0; k < 10; ++k) {
+//                    path = AIString.create();
+//                    Assimp.aiGetMaterialTexture(material, j, k, path, (IntBuffer) null, (IntBuffer) null, null, null, null, null);
+//                    if(path.dataString() != "") System.out.println(Assimp.TextureTypeToString(j) + "( material: "+ i + ", index: " + k + " ): " + path.dataString());
 //                }
 //            }
-
-            AIString path;
-            for(int j = 1; j < 22; ++j) {
-                for (int k = 0; k < 10; ++k) {
-                    path = AIString.create();
-                    Assimp.aiGetMaterialTexture(material, j, k, path, (IntBuffer) null, null, null, null, null, null);
-                    if(path.dataString() != "") System.out.println(Assimp.TextureTypeToString(j) + "( material: "+ i + ", index: " + k + " ): " + path.dataString());
-                }
-            }
         }
 
-        PointerBuffer textures = scene.mTextures();
-        for(int i = 0; i < scene.mNumTextures(); ++i) {
-            AITexture texture = AITexture.create(textures.get(i));
-            System.out.println(texture.mFilename().dataString());
-            System.out.println(texture.mWidth() + " " + texture.mHeight());
-        }
+//        PointerBuffer textures = scene.mTextures();
+//        for(int i = 0; i < scene.mNumTextures(); ++i) {
+//            AITexture texture = AITexture.create(textures.get(i));
+//            System.out.println(texture.mFilename().dataString());
+//            System.out.println(texture.mWidth() + " " + texture.mHeight());
+//        }
     }
 
     private void adjustTransform() {
@@ -245,6 +285,9 @@ public class Model {
         normals = new float[numberOfVertices * 3];
         texCords = new float[numberOfVertices * 2];
         indices = new int[numberOfIndices * 3];
+
+        tangents = BufferUtils.createFloatBuffer(numberOfVertices * 3);
+        bitangents = BufferUtils.createFloatBuffer(numberOfVertices * 3);
     }
 
     private void initAllMeshes(AIScene pScene) {
@@ -313,6 +356,24 @@ public class Model {
             meshes[j].max.x = boundingBox.mMax().x();
             meshes[j].max.y = boundingBox.mMax().y();
             meshes[j].max.z = boundingBox.mMax().z();
+
+            AIVector3D.Buffer vertexTangents = mesh.mTangents();
+            if(vertexTangents != null)
+                for(int i = 0; i < vertexTangents.limit(); i++) {
+                    AIVector3D vertexTangent = vertexTangents.get(i);
+                    tangents.put(vertexTangent.x());
+                    tangents.put(vertexTangent.y());
+                    tangents.put(vertexTangent.z());
+                }
+
+            AIVector3D.Buffer vertexBitangents = mesh.mBitangents();
+            if(vertexBitangents != null)
+                for(int i = 0; i < vertexBitangents.limit(); i++) {
+                    AIVector3D vertexBitangent = vertexBitangents.get(i);
+                    bitangents.put(vertexBitangent.x());
+                    bitangents.put(vertexBitangent.y());
+                    bitangents.put(vertexBitangent.z());
+                }
         }
     }
 
@@ -328,6 +389,9 @@ public class Model {
         vbos[TEX_COORD_BUFFER].uploadVertexAttributeData(vao, texCords, TEX_COORD_BUFFER, 2, BufferDataType.STATIC);
         vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals, NORMAL_BUFFER, 3, BufferDataType.STATIC);
         vbos[COLOR_BUFFER].uploadVertexAttributeData(vao, colors, COLOR_BUFFER, 4, BufferDataType.STATIC);
+
+        vbos[TANGENT_BUFFER].uploadVertexAttributeData(vao, tangents.flip(), TANGENT_BUFFER, 3, BufferDataType.STATIC);
+        vbos[BITANGENT_BUFFER].uploadVertexAttributeData(vao, bitangents.flip(), BITANGENT_BUFFER, 3, BufferDataType.STATIC);
 
         ibo.uploadIndicesData(vao, indices, BufferDataType.STATIC);
         vao.unbind();

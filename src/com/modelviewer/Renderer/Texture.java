@@ -17,7 +17,7 @@ public class Texture {
     private String filepath;
     private int width, height;
 
-    public void init(String filepath) {
+    public void init(String filepath, boolean asRed) {
         this.filepath = filepath;
 
         // Generate texture on GPU
@@ -43,7 +43,13 @@ public class Texture {
             this.width = width.get(0);
             this.height = height.get(0);
 
-            if (channels.get(0) == 3) {
+            if (channels.get(0) == 3 && asRed) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width.get(0), height.get(0),
+                        0, GL_RGB, GL_UNSIGNED_BYTE, image);
+            } else if (channels.get(0) == 4 && asRed) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width.get(0), height.get(0),
+                        0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+            } else if (channels.get(0) == 3) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0),
                         0, GL_RGB, GL_UNSIGNED_BYTE, image);
             } else if (channels.get(0) == 4) {
@@ -51,16 +57,21 @@ public class Texture {
                         0, GL_RGBA, GL_UNSIGNED_BYTE, image);
             } else if (channels.get(0) == 1) {
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width.get(0), height.get(0),
-                        0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+                            0, GL_RED, GL_UNSIGNED_BYTE, image);
             } else {
                 System.out.println("Error: (Texture) Unknown number of channesl '" + channels.get(0) + "'");
-                System.exit(-1);
+                return;
             }
         } else {
             System.out.println("Error: (Texture) Could not load image '" + filepath + "'");
+            return;
         }
 
         stbi_image_free(image);
+    }
+
+    public void init(String filepath) {
+        init(filepath, false);
     }
 
     public void bind(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {

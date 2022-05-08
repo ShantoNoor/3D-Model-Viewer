@@ -25,6 +25,7 @@ public class Camera {
 
     public Camera () {
         this.position = new Vector3f(0.0f, 0.0f, 0.0f);
+        this.defaultPosition = new Vector3f(0.0f, 0.0f, 0.0f);
         this.UP = new Vector3f(0.0f, 1.0f, 0.0f);
         this.RIGHT = new Vector3f(1.0f, 0.0f, 0.0f);
         this.viewDirection = new Vector3f(0.0f, 0.0f, -1.0f);
@@ -193,8 +194,8 @@ public class Camera {
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
-        this.defaultPosition = position;
+        this.position = new Vector3f(position);
+        this.defaultPosition = new Vector3f(position);
     }
 
     public Vector3f getViewDirection() {

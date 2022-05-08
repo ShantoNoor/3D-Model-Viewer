@@ -9,12 +9,10 @@ import static org.lwjgl.opengl.GL30.*;
 public class VAO {
     private int id;
     private ArrayList<Integer> vertexAttributes;
-    private ArrayList<VBO> vbos;
 
     public VAO() {
         id = glGenVertexArrays();
         vertexAttributes = new ArrayList<Integer>();
-        vbos = new ArrayList<>();
     }
 
     public void bind() {

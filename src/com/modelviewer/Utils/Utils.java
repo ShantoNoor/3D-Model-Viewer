@@ -4,6 +4,7 @@ import org.joml.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.AIMatrix4x4;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -133,5 +134,13 @@ public class Utils {
 
     public static void printOpenGLError() {
         System.out.println(glGetError());
+    }
+
+    public static String convertByteBufferToString(ByteBuffer dat) {
+        String ret = "";
+        for (int k = 0; k < dat.capacity(); k++) {
+            ret += (char)dat.get(k);
+        }
+        return ret.trim();
     }
 }
