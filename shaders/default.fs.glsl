@@ -39,5 +39,6 @@ void main()
     vec4 color = vec4(vec3(0.15f, 0.15f, 0.15f), 1.0f);
     if(fCol != vec4(0.0f)) color = fCol;
 
-    finalColor = texture(baseColor, texCod) * texture(aoMap, texCod).r * lightFactor + specularFactor * (1-texture(roughnessMap, texCod).r) * texture(metalnessMap, texCod).r + texture(baseColor, texCod) * 0.4;
+    vec4 finalBaseColor = texture(baseColor, texCod) * texture(aoMap, texCod).r;
+    finalColor = finalBaseColor * lightFactor + specularFactor * (1-texture(roughnessMap, texCod).r) * texture(metalnessMap, texCod).r + finalBaseColor * 0.5;
 }

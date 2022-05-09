@@ -29,8 +29,10 @@ void main()
     fTex = aTex;
     fCol = aCol;
 
-    mat4 model = rotate * transform * mesh;
-    fNor = normalize(mat3(transpose(inverse(model))) * aNor);
+    mat4 model = transform * mesh;
+    mat3 modelForNormal = mat3(transpose(inverse(model)));
+
+    fNor = normalize(modelForNormal * aNor);
 
     fPos = vec3(model * vec4(aPos, 1.0f));
     cp = camPos;
@@ -38,8 +40,8 @@ void main()
 
     gl_Position =  projection * view  * model * vec4(aPos, 1.0f);;
 
-    vec3 T = normalize(mat3(transpose(inverse(model))) * aTan);
-    vec3 B = normalize(mat3(transpose(inverse(model))) * aBtan);
-    vec3 N = normalize(mat3(transpose(inverse(model))) * aNor);
+    vec3 T = normalize(modelForNormal * aTan);
+    vec3 B = normalize(modelForNormal * aBtan);
+    vec3 N = normalize(modelForNormal * aNor);
     TBN = transpose(mat3(T, B, N));
 }

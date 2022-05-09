@@ -29,7 +29,7 @@ public class Camera {
         this.UP = new Vector3f(0.0f, 1.0f, 0.0f);
         this.RIGHT = new Vector3f(1.0f, 0.0f, 0.0f);
         this.viewDirection = new Vector3f(0.0f, 0.0f, -1.0f);
-        this.movementSpeed = 9.5f;
+        this.movementSpeed = 20.0f;
         this.mouseSensitivity = 1.0f;
         this.normalizedCameraRightVector = new Vector3f();
         this.pitchLimit = 45.0f * Constants.TO_RADIAN;

@@ -8,13 +8,14 @@ public class Quad {
     private VBO vbo;
     private IBO ibo;
 
-    private float val = 2.0f;
+    private float val = 1.0f;
+    private float zVal = 0.9999f;
     private float[] vertexArray = {
              // positions
-             val, -val, 0.0f,
-            -val,  val, 0.0f,
-             val,  val, 0.0f,
-            -val, -val, 0.0f
+             val, -val, zVal,
+            -val,  val, zVal,
+             val,  val, zVal,
+            -val, -val, zVal
     };
     private int[] elementArray = {
             2, 1, 0,

@@ -80,7 +80,6 @@ public class Bag extends Window {
         shaderProgram.safeUpload("projection", projectionMatrix);
 
         shaderProgram.safeUpload("view", camera.getViewMatrix());
-        shaderProgram.safeUpload("transform", model.getTransform());
         shaderProgram.safeUpload("camPos", camera.getPosition());
         shaderProgram.safeUpload("lightF", new Vector3f(100, 100.0f, 100.0f));
         shaderProgram.safeUpload("rotate", rotate.rotate(dt, Constants.Y_AXIS));

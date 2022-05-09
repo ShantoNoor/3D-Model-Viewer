@@ -51,7 +51,6 @@ public class ModelViewer3D extends Window {
         quadShaderProgram.safeUpload("projection", getProjectionMatrix());
 
         shaderProgram.safeUpload("view", camera.getViewMatrix());
-        shaderProgram.safeUpload("transform", model.getTransform());
         shaderProgram.safeUpload("camPos", camera.getPosition());
         shaderProgram.safeUpload("lightF", camera.getViewDirection());
         texture.bind(shaderProgram, "tex", 0);
@@ -63,6 +62,6 @@ public class ModelViewer3D extends Window {
     }
 
     public static void main(String[] args) {
-        new ModelViewer3D(1280, 720, "3DModelViewer").run();
+        new ModelViewer3D(1280, 720, "3D Model Viewer").run();
     }
 }

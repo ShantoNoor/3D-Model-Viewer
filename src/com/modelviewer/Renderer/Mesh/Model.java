@@ -233,6 +233,8 @@ public class Model {
         vao.bind();
         ibo.bind();
 
+        shaderProgram.upload("transform", transform);
+
         if(modelSuccessfullyLoaded) {
             for (int i = 0; i < meshes.length; ++i) {
                 shaderProgram.upload("mesh", meshes[i].modelTransform);
@@ -410,5 +412,9 @@ public class Model {
 
     public float getDistance() {
         return distance;
+    }
+
+    public void rotate(float angle, Vector3f axis) {
+        new Matrix4f().rotate(angle, axis).mul(transform, transform);
     }
 }
