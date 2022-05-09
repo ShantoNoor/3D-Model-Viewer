@@ -109,9 +109,9 @@ public class Model {
                     System.out.println(Assimp.TextureTypeToString(property.mSemantic()) + ": " + Utils.convertByteBufferToString(property.mData()));
                 }
 
-                if(key.equals(Assimp.ai_AI_MATKEY_GLTF_MAPPINGFILTER_MAG_BASE)) {
-                    System.out.println(Utils.convertByteBufferToString(property.mData()));
-                }
+//                if(key.equals(Assimp.ai_AI_MATKEY_GLTF_MAPPINGFILTER_MAG_BASE)) {
+//                    System.out.println(Utils.convertByteBufferToString(property.mData()));
+//                }
 
 //                System.out.println("Material: (" + i + ", " + j + "): ");
                 if(key.equals(Assimp.AI_MATKEY_GLOSSINESS_FACTOR)) {
