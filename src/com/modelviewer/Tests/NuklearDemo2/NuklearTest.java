@@ -1,4 +1,4 @@
-package com.modelviewer.Tests;
+package com.modelviewer.Tests.NuklearDemo2;
 
 import com.modelviewer.Camera.Camera;
 import com.modelviewer.Renderer.Cube;
@@ -19,11 +19,10 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 import static org.lwjgl.stb.STBImage.*;
 
-public class CubeMap extends Window {
+public class NuklearTest extends Window {
     private Camera camera;
     private ShaderProgram shaderProgram;
     private Model model;
@@ -33,7 +32,7 @@ public class CubeMap extends Window {
     private Texture metalnessMap;
     private Texture roughnessMap;
 
-    public CubeMap(int width, int height, String title) {
+    public NuklearTest(int width, int height, String title) {
         super(width, height, title);
     }
 
@@ -179,6 +178,6 @@ public class CubeMap extends Window {
     }
 
     public static void main(String[] args) {
-        new CubeMap(1200, 800, "Cube Map").run();
+        new NuklearTest(1200, 800, "Nuklear Test").run();
     }
 }

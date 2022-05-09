@@ -102,7 +102,7 @@ public class NuklearDemo {
 
     public NuklearDemo() {
         try {
-            this.ttf = ioResourceToByteBuffer("demo/FiraSans.ttf", 512 * 1024);
+            this.ttf = ioResourceToByteBuffer("FiraSans-Light.ttf", 1024 * 1024);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

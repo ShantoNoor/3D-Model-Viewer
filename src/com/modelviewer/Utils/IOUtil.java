@@ -1,4 +1,4 @@
-package com.modelviewer.Tests.NuklearDemo;
+package com.modelviewer.Utils;
 
 /*
  * Copyright LWJGL. All rights reserved.

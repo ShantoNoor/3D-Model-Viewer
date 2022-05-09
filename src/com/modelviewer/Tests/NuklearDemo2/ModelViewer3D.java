@@ -1,4 +1,4 @@
-package com.modelviewer;
+package com.modelviewer.Tests.NuklearDemo2;
 
 import com.modelviewer.Camera.Camera;
 import com.modelviewer.Renderer.Mesh.Model;
