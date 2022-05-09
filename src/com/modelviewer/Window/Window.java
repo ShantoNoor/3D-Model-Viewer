@@ -4,10 +4,16 @@ import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.Input.KeyListener;
 import com.modelviewer.Window.Input.MouseListener;
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.flag.ImGuiConfigFlags;
+import imgui.gl3.ImGuiImplGl3;
+import imgui.glfw.ImGuiImplGlfw;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.Version;
+import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -23,6 +29,11 @@ abstract public class Window {
     private String title;
     protected int width, height;
     protected long glfwWindow;
+
+    private final ImGuiImplGlfw imGuiGlfw = new ImGuiImplGlfw();
+    private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
+    private String glslVersion = "#version 330";
+    private ImGuiLayer imguiLayer;
 
     private boolean showFps;
     private Vector4f clearColor;
@@ -46,6 +57,8 @@ abstract public class Window {
         this.fieldOfView = 45;
         this.nearPlane = 0.1f;
         this.farPlane = 100.0f;
+
+        this.imguiLayer = new ImGuiLayer();
 
         updateProjectionMatrix();
     }
@@ -109,6 +122,13 @@ abstract public class Window {
         glEnable(GL_DEPTH_TEST);
 
         System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
+
+        ImGui.createContext();
+        ImGuiIO io = ImGui.getIO();
+        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+
+        imGuiGlfw.init(glfwWindow, true);
+        imGuiGl3.init(glslVersion);
     }
 
     public void run() {
@@ -130,11 +150,23 @@ abstract public class Window {
             glfwPollEvents();
             handleResize();
 
-
             glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
             glClear(windowFlags);
 
             loop(dt);
+
+            imGuiGlfw.newFrame();
+            ImGui.newFrame();
+            imguiLayer.imgui();
+            ImGui.render();
+            imGuiGl3.renderDrawData(ImGui.getDrawData());
+
+            if (ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
+//                final long backupWindowPtr = org.lwjgl.glfw.GLFW.glfwGetCurrentContext();
+                ImGui.updatePlatformWindows();
+                ImGui.renderPlatformWindowsDefault();
+                glfwMakeContextCurrent(glfwWindow);
+            }
 
             glfwSwapBuffers(glfwWindow);
 
@@ -147,7 +179,10 @@ abstract public class Window {
     }
 
     public void clear() {
-        // Free memory
+        imGuiGl3.dispose();
+        imGuiGlfw.dispose();
+        ImGui.destroyContext();
+
         glfwFreeCallbacks(glfwWindow);
         glfwDestroyWindow(glfwWindow);
 

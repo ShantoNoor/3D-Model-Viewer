@@ -3,7 +3,36 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CubeMaps" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/CubeMaps/CubeMap1" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/CubeMaps/CubeMap2" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/astronaut" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/astronaut/source" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/astronaut/textures" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/backpack" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/car" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/dragon" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/dragon/textures" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/nanosuit" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/pistol" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/pistol/source" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/pistol/textures" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/pistol2" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/pistol2/source" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/pistol2/textures" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/rifel" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/rifel/source" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/rifel/textures" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/simple-sword" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/simple-sword/source" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/TestModels/simple-sword/textures" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/shaders" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/LWJGL" />
+      <excludeFolder url="file://$MODULE_DIR$/ImGui" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

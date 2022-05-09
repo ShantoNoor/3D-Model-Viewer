@@ -37,6 +37,9 @@
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb-natives-windows.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ImGui/jars/imgui-app-1.86.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ImGui/jars/imgui-binding-1.86.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ImGui/jars/imgui-lwjgl3-1.86.4.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-assimp-javadoc.jar!/" />
@@ -57,6 +60,9 @@
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-opengl-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ImGui/jars/imgui-app-1.86.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ImGui/jars/imgui-binding-1.86.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ImGui/jars/imgui-lwjgl3-1.86.4-sources.jar!/" />
     </SOURCES>
   </library>
 </component>
