@@ -1,4 +1,4 @@
-package com.modelviewer.Tests.NuklearDemo;
+package com.modelviewer.Window;
 
 /*
  * Copyright LWJGL. All rights reserved.
@@ -40,7 +40,7 @@ class Calculator {
 
     final NkPluginFilter numberFilter;
 
-    Calculator() {
+    public Calculator() {
         format.setGroupingUsed(false);
         format.setDecimalSeparatorAlwaysShown(true);
 

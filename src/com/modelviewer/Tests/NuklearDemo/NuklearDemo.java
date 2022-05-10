@@ -45,16 +45,19 @@ import static org.lwjgl.system.MemoryUtil.*;
  * <a href="https://github.com/vurtun/nuklear/tree/master/demo/glfw_opengl3">https://github.com/vurtun/nuklear/tree/master/demo/glfw_opengl3</a>.</p>
  */
 public class NuklearDemo {
+    public static void main(String[] args) {
+        new NuklearDemo().run();
+    }
+
+    private long win;
+    private int width, height;
 
     private static final int BUFFER_INITIAL_SIZE = 4 * 1024;
-
     private static final int MAX_VERTEX_BUFFER  = 512 * 1024;
     private static final int MAX_ELEMENT_BUFFER = 128 * 1024;
-
     private static final NkAllocator ALLOCATOR;
-
+    private final ByteBuffer ttf;
     private static final NkDrawVertexLayoutElement.Buffer VERTEX_LAYOUT;
-
     static {
         ALLOCATOR = NkAllocator.create()
                 .alloc((handle, old, size) -> nmemAllocChecked(size))
@@ -67,36 +70,17 @@ public class NuklearDemo {
                 .position(3).attribute(NK_VERTEX_ATTRIBUTE_COUNT).format(NK_FORMAT_COUNT).offset(0)
                 .flip();
     }
-
-    public static void main(String[] args) {
-        new NuklearDemo().run();
-    }
-
-    private final ByteBuffer ttf;
-
-    private long win;
-
-    private int
-            width,
-            height;
-
-    private int
-            display_width,
-            display_height;
-
+    private int display_width, display_height;
     private NkContext  ctx          = NkContext.create();
     private NkUserFont default_font = NkUserFont.create();
-
     private NkBuffer          cmds         = NkBuffer.create();
     private NkDrawNullTexture null_texture = NkDrawNullTexture.create();
-
     private int vbo, vao, ebo;
     private int prog;
     private int vert_shdr;
     private int frag_shdr;
     private int uniform_tex;
     private int uniform_proj;
-
     private final Demo       demo = new Demo();
     private final Calculator calc = new Calculator();
 

@@ -80,6 +80,8 @@ public class Camera {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             cameraModes = CameraModes.None;
         }
+
+        System.out.println(cameraModes);
     }
 
     private void updateZoom() {

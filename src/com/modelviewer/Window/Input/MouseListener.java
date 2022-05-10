@@ -11,6 +11,7 @@ public class MouseListener {
     private double scrollX, scrollY;
     private boolean mouseButtonPressed[] = new boolean[3];
     private boolean isDragging, isScrolling;
+    public boolean insideMainWindow;
 
     private MouseListener() {
         this.scrollX = 0.0;
@@ -34,7 +35,7 @@ public class MouseListener {
         get().xPos = xpos;
         get().yPos = ypos;
 
-        get().isDragging = get().mouseButtonPressed[0] || get().mouseButtonPressed[1] || get().mouseButtonPressed[2];
+        get().isDragging = get().mouseButtonPressed[0] | get().mouseButtonPressed[1] | get().mouseButtonPressed[2];
     }
 
     public static void mouseButtonCallback(long window, int button, int action, int mods)  {
@@ -85,11 +86,11 @@ public class MouseListener {
     }
 
     public static boolean isDragging() {
-        return get().isDragging;
+        return get().isDragging & get().insideMainWindow;
     }
 
     public static boolean isScrolling() {
-        return get().isScrolling;
+        return get().isScrolling & get().insideMainWindow;
     }
 
     public static void stopScrolling() {

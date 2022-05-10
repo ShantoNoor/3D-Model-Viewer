@@ -1,4 +1,4 @@
-package com.modelviewer.Tests.NuklearDemo;
+package com.modelviewer.Window;
 
 /*
  * Copyright LWJGL. All rights reserved.
@@ -33,7 +33,7 @@ class Demo {
 
     private IntBuffer compression = BufferUtils.createIntBuffer(1).put(0, 20);
 
-    Demo() {
+    public Demo() {
     }
 
     void layout(NkContext ctx, int x, int y) {
