@@ -7,13 +7,13 @@ import com.modelviewer.Window.Input.MouseListener;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.flag.ImGuiConfigFlags;
+import imgui.flag.ImGuiHoveredFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.Version;
-import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 
@@ -163,8 +163,17 @@ abstract public class Window {
 
             if (ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
 //                final long backupWindowPtr = org.lwjgl.glfw.GLFW.glfwGetCurrentContext();
+
                 ImGui.updatePlatformWindows();
                 ImGui.renderPlatformWindowsDefault();
+
+                if(ImGui.isWindowHovered(ImGuiHoveredFlags.AnyWindow)) {
+                    MouseListener.setInMainWindow(false);
+                    System.out.println("hi");
+                } else {
+                    MouseListener.setInMainWindow(true);
+                }
+                
                 glfwMakeContextCurrent(glfwWindow);
             }
 

@@ -51,34 +51,35 @@ public class Camera {
     }
 
     public void mouseUpdate(long glfwWindow, int windowWidth, int windowHeight) {
-        Vector2f mousePosition = MouseListener.getXY();
+        if(MouseListener.isInMainWindow()) {
+            Vector2f mousePosition = MouseListener.getXY();
 
-        if( (mousePosition.x >= 0.0f) && (mousePosition.x <= (float) windowWidth) &&
-                (mousePosition.y >= 0.0f) && (mousePosition.y <= (float) windowHeight) && cameraModes == CameraModes.None )
-        {
-            calculateCameraVectors();
+            if ((mousePosition.x >= 0.0f) && (mousePosition.x <= (float) windowWidth) &&
+                    (mousePosition.y >= 0.0f) && (mousePosition.y <= (float) windowHeight) && cameraModes == CameraModes.None) {
+                calculateCameraVectors();
 
-            if(MouseListener.isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-                cameraModes = CameraModes.FirstPerson;
-            } else if(MouseListener.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-                cameraModes = CameraModes.Orbit;
-                firstClick = true;
-            } else if(MouseListener.isScrolling()) {
-                cameraModes = CameraModes.Zoom;
+                if (MouseListener.isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+                    cameraModes = CameraModes.FirstPerson;
+                } else if (MouseListener.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                    cameraModes = CameraModes.Orbit;
+                    firstClick = true;
+                } else if (MouseListener.isScrolling()) {
+                    cameraModes = CameraModes.Zoom;
+                }
             }
-        }
 
-        if(cameraModes == CameraModes.FirstPerson && MouseListener.isDragging()) {
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            updateFirstPerson();
-        } else if(cameraModes == CameraModes.Orbit && MouseListener.isDragging()) {
-            updateOrbit(windowWidth, windowHeight);
-        } else if(cameraModes == CameraModes.Zoom) {
-            updateZoom();
-            cameraModes = CameraModes.None;
-        } else {
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            cameraModes = CameraModes.None;
+            if (cameraModes == CameraModes.FirstPerson && MouseListener.isDragging()) {
+                glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                updateFirstPerson();
+            } else if (cameraModes == CameraModes.Orbit && MouseListener.isDragging()) {
+                updateOrbit(windowWidth, windowHeight);
+            } else if (cameraModes == CameraModes.Zoom) {
+                updateZoom();
+                cameraModes = CameraModes.None;
+            } else {
+                glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                cameraModes = CameraModes.None;
+            }
         }
     }
 

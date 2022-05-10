@@ -11,6 +11,7 @@ public class MouseListener {
     private double scrollX, scrollY;
     private boolean mouseButtonPressed[] = new boolean[3];
     private boolean isDragging, isScrolling;
+    private boolean inMainWindow;
 
     private MouseListener() {
         this.scrollX = 0.0;
@@ -94,6 +95,14 @@ public class MouseListener {
 
     public static void stopScrolling() {
         get().isScrolling = false;
+    }
+
+    public static boolean isInMainWindow() {
+        return get().inMainWindow;
+    }
+
+    public static void setInMainWindow(boolean value) {
+        get().inMainWindow = value;
     }
 
     public static boolean isMouseButtonPressed(int button) {
