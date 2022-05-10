@@ -1,4 +1,4 @@
-package com.modelviewer.Window;
+package com.modelviewer.Tests.NuklearTest;
 
 /*
  * Copyright LWJGL. All rights reserved.
@@ -18,8 +18,7 @@ import static org.lwjgl.system.MemoryStack.*;
  * Java port of
  * <a href="https://github.com/vurtun/nuklear/blob/master/demo/glfw_opengl3/main.c">https://github.com/vurtun/nuklear/blob/master/demo/glfw_opengl3/main.c</a>.
  */
-class Demo {
-
+public class Demo extends NuklearLayer{
     private static final int EASY = 0;
     private static final int HARD = 1;
 
@@ -33,10 +32,12 @@ class Demo {
 
     private IntBuffer compression = BufferUtils.createIntBuffer(1).put(0, 20);
 
-    public Demo() {
+    public Demo(NkContext ctx) {
+        super(ctx);
     }
 
-    void layout(NkContext ctx, int x, int y) {
+    @Override
+    public void layout(int x, int y) {
         try (MemoryStack stack = stackPush()) {
             NkRect rect = NkRect.malloc(stack);
 

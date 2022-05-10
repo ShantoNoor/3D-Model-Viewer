@@ -63,15 +63,15 @@ public class Camera {
             } else if(MouseListener.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
                 cameraModes = CameraModes.Orbit;
                 firstClick = true;
-            } else if(MouseListener.isScrolling()) {
+            } else if(MouseListener.isScrollingOverMainGlfwWindow()) {
                 cameraModes = CameraModes.Zoom;
             }
         }
 
-        if(cameraModes == CameraModes.FirstPerson && MouseListener.isDragging()) {
+        if(cameraModes == CameraModes.FirstPerson && MouseListener.isDraggingOverMainGlfwWindow()) {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             updateFirstPerson();
-        } else if(cameraModes == CameraModes.Orbit && MouseListener.isDragging()) {
+        } else if(cameraModes == CameraModes.Orbit && MouseListener.isDraggingOverMainGlfwWindow()) {
             updateOrbit(windowWidth, windowHeight);
         } else if(cameraModes == CameraModes.Zoom) {
             updateZoom();
@@ -80,8 +80,6 @@ public class Camera {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             cameraModes = CameraModes.None;
         }
-
-        System.out.println(cameraModes);
     }
 
     private void updateZoom() {

@@ -1,4 +1,4 @@
-package com.modelviewer.Window;
+package com.modelviewer.Tests.NuklearTest;
 
 /*
  * Copyright LWJGL. All rights reserved.
@@ -19,7 +19,7 @@ import static org.lwjgl.system.MemoryUtil.*;
  * Java port of
  * <a href="https://github.com/vurtun/nuklear/blob/master/demo/calculator.c">https://github.com/vurtun/nuklear/blob/master/demo/calculator.c</a>.
  */
-class Calculator {
+class Calculator extends NuklearLayer{
 
     private static final String NUMS = "789456123";
     private static final String OPS  = "+-*/";
@@ -40,7 +40,8 @@ class Calculator {
 
     final NkPluginFilter numberFilter;
 
-    public Calculator() {
+    public Calculator(NkContext ctx) {
+        super(ctx);
         format.setGroupingUsed(false);
         format.setDecimalSeparatorAlwaysShown(true);
 
@@ -54,7 +55,8 @@ class Calculator {
         numberFilter = NkPluginFilter.create(Nuklear::nnk_filter_float);
     }
 
-    void layout(NkContext ctx, int x, int y) {
+    @Override
+    public void layout(int x, int y) {
         try (MemoryStack stack = stackPush()) {
             NkRect rect = NkRect.malloc(stack);
             if (nk_begin(ctx, "Calculator", nk_rect(x, y, 180, 250, rect), NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_MOVABLE)) {

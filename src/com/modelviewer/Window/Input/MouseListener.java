@@ -11,7 +11,7 @@ public class MouseListener {
     private double scrollX, scrollY;
     private boolean mouseButtonPressed[] = new boolean[3];
     private boolean isDragging, isScrolling;
-    public boolean insideMainWindow;
+    private boolean isAboveMainGlfwWindow;
 
     private MouseListener() {
         this.scrollX = 0.0;
@@ -86,11 +86,19 @@ public class MouseListener {
     }
 
     public static boolean isDragging() {
-        return get().isDragging & get().insideMainWindow;
+        return get().isDragging;
+    }
+
+    public static boolean isDraggingOverMainGlfwWindow() {
+        return get().isDragging & get().isAboveMainGlfwWindow;
     }
 
     public static boolean isScrolling() {
-        return get().isScrolling & get().insideMainWindow;
+        return get().isScrolling;
+    }
+
+    public static boolean isScrollingOverMainGlfwWindow() {
+        return get().isScrolling & get().isAboveMainGlfwWindow;
     }
 
     public static void stopScrolling() {
@@ -114,5 +122,9 @@ public class MouseListener {
 
     public static Vector2f getScrollXY() {
         return new Vector2f(getScrollX(), getScrollY());
+    }
+
+    public static void setIsAboveMainGlfwWindow(boolean value) {
+        get().isAboveMainGlfwWindow = value;
     }
 }

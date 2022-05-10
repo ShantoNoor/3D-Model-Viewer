@@ -1,6 +1,7 @@
 package com.modelviewer.Window;
 
-
+import com.modelviewer.Tests.NuklearTest.Demo;
+import com.modelviewer.Tests.NuklearTest.NuklearLayer;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.Input.KeyListener;
@@ -24,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.modelviewer.Utils.IOUtil.ioResourceToByteBuffer;
@@ -91,7 +93,7 @@ abstract public class Window {
                 .flip();
     }
     private int display_width, display_height;
-    private NkContext ctx          = NkContext.create();
+    protected NkContext ctx          = NkContext.create();
     private NkUserFont default_font = NkUserFont.create();
     private NkBuffer cmds         = NkBuffer.create();
     private NkDrawNullTexture null_texture = NkDrawNullTexture.create();
@@ -101,8 +103,9 @@ abstract public class Window {
     private int frag_shdr;
     private int uniform_tex;
     private int uniform_proj;
-    private final Demo demo = new Demo();
-    private final Calculator calc = new Calculator();
+
+    public NuklearLayer nk;
+
     //
 
     public Window(int width, int height, String title) {
@@ -490,10 +493,12 @@ abstract public class Window {
             }
         });
         glfwSetCursorPosCallback(win, (window, xpos, ypos) -> {
-            if(Nuklear.nk_window_is_any_hovered(ctx)) {
-                MouseListener.get().insideMainWindow = false;
-            } else {
-                MouseListener.get().insideMainWindow = true;
+            if(!MouseListener.isDragging()) {
+                if (Nuklear.nk_window_is_any_hovered(ctx)) {
+                    MouseListener.setIsAboveMainGlfwWindow(false);
+                } else {
+                    MouseListener.setIsAboveMainGlfwWindow(true);
+                }
             }
             MouseListener.mousePosCallback(window, xpos, ypos);
             nk_input_motion(ctx, (int)xpos, (int)ypos);
@@ -552,18 +557,18 @@ abstract public class Window {
     }
 
     private void newFrame() {
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer w = stack.mallocInt(1);
-            IntBuffer h = stack.mallocInt(1);
+        IntBuffer w = BufferUtils.createIntBuffer(1);
+        IntBuffer h = BufferUtils.createIntBuffer(1);
 
-            glfwGetWindowSize(glfwWindow, w, h);
-            width = w.get(0);
-            height = h.get(0);
+        glfwGetWindowSize(glfwWindow, w, h);
+        width = w.get(0);
+        height = h.get(0);
 
-            glfwGetFramebufferSize(glfwWindow, w, h);
-            display_width = w.get(0);
-            display_height = h.get(0);
-        }
+        glfwGetFramebufferSize(glfwWindow, w, h);
+        display_width = w.get(0);
+        display_height = h.get(0);
+
+        updateProjectionMatrix();
 
         nk_input_begin(ctx);
         glfwPollEvents();
@@ -580,7 +585,6 @@ abstract public class Window {
         } else if (mouse.ungrab()) {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
-
         nk_input_end(ctx);
     }
 
@@ -677,6 +681,8 @@ abstract public class Window {
         glDisable(GL_BLEND);
         glDisable(GL_SCISSOR_TEST);
         glEnable(GL_DEPTH_TEST);
+
+//        nk = new Demo(ctx, 50, 50);
     }
 
     public void mainLoop() {
@@ -684,60 +690,24 @@ abstract public class Window {
         float endTime = 0.0f;
         float dt = 0.0f;
 
-        newFrame();
-
-        demo.layout(ctx, 50, 50);
-        calc.layout(ctx, 300, 50);
-
-        try (MemoryStack stack = stackPush()) {
-            IntBuffer width  = stack.mallocInt(1);
-            IntBuffer height = stack.mallocInt(1);
-
-            glfwGetWindowSize(glfwWindow, width, height);
-            glViewport(0, 0, width.get(0), height.get(0));
-
-            NkColorf bg = demo.background;
-            glClearColor(bg.r(), bg.g(), bg.b(), bg.a());
-        }
-
         while (!glfwWindowShouldClose(glfwWindow)) {
             beginTime = Utils.getTime();
 
             newFrame();
 
-            // Poll events
-            glfwPollEvents();
-            handleResize();
-
+            glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
             glClear(windowFlags);
 
             loop(dt);
-
-            demo.layout(ctx, 50, 50);
-            calc.layout(ctx, 300, 50);
-
-            try (MemoryStack stack = stackPush()) {
-                IntBuffer width  = stack.mallocInt(1);
-                IntBuffer height = stack.mallocInt(1);
-
-                glfwGetWindowSize(glfwWindow, width, height);
-                glViewport(0, 0, width.get(0), height.get(0));
-
-                NkColorf bg = demo.background;
-                glClearColor(bg.r(), bg.g(), bg.b(), bg.a());
-            }
-
             render(NK_ANTI_ALIASING_ON, MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
 
             glfwSwapBuffers(glfwWindow);
 
-            endTime = Utils.getTime();
-            dt = endTime - beginTime;
-
             if(showFps)
                 glfwSetWindowTitle(glfwWindow, title + " FPS: " + (int) (1 / dt));
 
-            System.out.println("insideMainWindow: " + MouseListener.get().insideMainWindow);
+            endTime = Utils.getTime();
+            dt = endTime - beginTime;
         }
     }
 
@@ -752,15 +722,6 @@ abstract public class Window {
 
     abstract public void loop(float dt);
     abstract public void setup();
-
-    private void handleResize() {
-        IntBuffer windowWidth = BufferUtils.createIntBuffer(1);
-        IntBuffer windowHeight = BufferUtils.createIntBuffer(1);
-        glfwGetWindowSize(glfwWindow, windowWidth, windowHeight);
-        width = windowWidth.get();
-        height = windowHeight.get();
-        updateProjectionMatrix();
-    }
 
     public String getTitle() {
         return title;

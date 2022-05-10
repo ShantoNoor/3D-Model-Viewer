@@ -1,4 +1,4 @@
-package com.modelviewer.Tests;
+package com.modelviewer.Tests.NuklearTest;
 
 import com.modelviewer.Camera.Camera;
 import com.modelviewer.Renderer.Mesh.Model;
@@ -8,6 +8,7 @@ import com.modelviewer.Utils.Constants;
 import com.modelviewer.Window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class NuklearTest extends Window {
     private Camera camera;
@@ -19,11 +20,15 @@ public class NuklearTest extends Window {
     private Texture metalnessMap;
     private Texture roughnessMap;
 
+//    private final Calculator calc = new Calculator();
+
     public NuklearTest(int width, int height, String title) {
         super(width, height, title);
     }
 
     Matrix4f rotate;
+    Demo demo;
+    Calculator cal;
 
     @Override
     public void setup() {
@@ -54,10 +59,14 @@ public class NuklearTest extends Window {
         camera.setPosition(new Vector3f(0.0f, 0.0f, model.getDistance()));
 
         rotate = new Matrix4f();
+
+        demo = new Demo(ctx);
+        cal = new Calculator(ctx);
     }
 
     @Override
     public void loop(float dt) {
+
         camera.mouseUpdate(glfwWindow, width, height);
         camera.keyboardUpdate(dt);
 
@@ -75,9 +84,14 @@ public class NuklearTest extends Window {
         roughnessMap.bind(shaderProgram, "roughnessMap", 4);
 
         model.render(shaderProgram);
+
+        demo.layout(50, 50);
+        cal.layout(300, 60);
+
+        setClearColor(new Vector4f(demo.background.r(), demo.background.g(), demo.background.b(), demo.background.a()));
     }
 
     public static void main(String[] args) {
-        new Gun(1200, 800, "Nuklear Test").run();
+        new NuklearTest(1000, 600, "Nuklear Test").run();
     }
 }
