@@ -1,6 +1,5 @@
 package com.modelviewer.Window;
 
-import com.modelviewer.Tests.NuklearTest.Demo;
 import com.modelviewer.Tests.NuklearTest.NuklearLayer;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
@@ -25,7 +24,6 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static com.modelviewer.Utils.IOUtil.ioResourceToByteBuffer;
@@ -64,7 +62,6 @@ abstract public class Window {
     protected int width, height;
     protected long glfwWindow;
 
-    private boolean showFps;
     private Vector4f clearColor;
     private int windowFlags;
 
@@ -104,8 +101,7 @@ abstract public class Window {
     private int uniform_tex;
     private int uniform_proj;
 
-    public NuklearLayer nk;
-
+    protected NuklearLayer info;
     //
 
     public Window(int width, int height, String title) {
@@ -113,7 +109,6 @@ abstract public class Window {
         this.width = width;
 
         this.title = title;
-        this.showFps = true;
 
         this.clearColor = new Vector4f(0.15f, 0.15f, 0.15f, 1.0f);
         this.windowFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
@@ -312,7 +307,7 @@ abstract public class Window {
         // Enabling Depth Test
         glEnable(GL_DEPTH_TEST);
 
-        System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
+//        System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
     }
 
     public void run() {
@@ -681,14 +676,18 @@ abstract public class Window {
         glDisable(GL_BLEND);
         glDisable(GL_SCISSOR_TEST);
         glEnable(GL_DEPTH_TEST);
-
-//        nk = new Demo(ctx, 50, 50);
     }
 
     public void mainLoop() {
         float beginTime = 0.0f;
         float endTime = 0.0f;
         float dt = 0.0f;
+
+        info = new NuklearLayer(ctx,
+                "About",
+                Utils.createNkRect(10, height - 10 - 170, 300, 170),
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_CLOSABLE
+                );
 
         while (!glfwWindowShouldClose(glfwWindow)) {
             beginTime = Utils.getTime();
@@ -703,8 +702,21 @@ abstract public class Window {
 
             glfwSwapBuffers(glfwWindow);
 
-            if(showFps)
-                glfwSetWindowTitle(glfwWindow, title + " FPS: " + (int) (1 / dt));
+            if(!nk_window_is_closed(ctx, "About")) {
+                if(info.begin()) {
+                    nk_layout_row_dynamic(ctx, 0, 1);
+                    String fps = "FPS: " + Integer.toString((int) (1 / dt));
+                    nk_text(ctx, fps, NK_TEXT_ALIGN_CENTERED);
+
+                    nk_layout_row_dynamic(ctx, 0, 1);
+                    nk_text(ctx, "3D Model Viewer", NK_TEXT_ALIGN_CENTERED);
+
+                    nk_layout_row_dynamic(ctx, 0, 1);
+                    String openglVersion = "OpenGL Version: " + glGetString(GL_VERSION);
+                    nk_text(ctx, openglVersion, NK_TEXT_ALIGN_CENTERED);
+                }
+                nk_end(ctx);
+            }
 
             endTime = Utils.getTime();
             dt = endTime - beginTime;
@@ -767,10 +779,6 @@ abstract public class Window {
     public void setHeight(int height) {
         this.height = height;
         updateProjectionMatrix();
-    }
-
-    public void setShowFps(boolean showFps) {
-        this.showFps = showFps;
     }
 
     public void setFieldOfView(float fieldOfView) {

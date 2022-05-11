@@ -55,7 +55,6 @@ class Calculator extends NuklearLayer{
         numberFilter = NkPluginFilter.create(Nuklear::nnk_filter_float);
     }
 
-    @Override
     public void layout(int x, int y) {
         try (MemoryStack stack = stackPush()) {
             NkRect rect = NkRect.malloc(stack);

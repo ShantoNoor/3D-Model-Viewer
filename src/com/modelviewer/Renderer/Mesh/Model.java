@@ -58,6 +58,8 @@ public class Model {
     public Model() { }
 
     public boolean loadMesh(String filePath) {
+        if(modelSuccessfullyLoaded) return !modelSuccessfullyLoaded;
+
         int importFlags = Assimp.aiProcess_CalcTangentSpace
                             | Assimp.aiProcess_GenSmoothNormals
                             | Assimp.aiProcess_JoinIdenticalVertices

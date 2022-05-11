@@ -18,7 +18,7 @@ import static org.lwjgl.system.MemoryStack.*;
  * Java port of
  * <a href="https://github.com/vurtun/nuklear/blob/master/demo/glfw_opengl3/main.c">https://github.com/vurtun/nuklear/blob/master/demo/glfw_opengl3/main.c</a>.
  */
-public class Demo extends NuklearLayer{
+public class Demo{
     private static final int EASY = 0;
     private static final int HARD = 1;
 
@@ -33,10 +33,8 @@ public class Demo extends NuklearLayer{
     private IntBuffer compression = BufferUtils.createIntBuffer(1).put(0, 20);
 
     public Demo(NkContext ctx) {
-        super(ctx);
     }
 
-    @Override
     public void layout(int x, int y) {
         try (MemoryStack stack = stackPush()) {
             NkRect rect = NkRect.malloc(stack);

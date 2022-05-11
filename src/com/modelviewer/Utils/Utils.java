@@ -3,6 +3,7 @@ package com.modelviewer.Utils;
 import org.joml.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.AIMatrix4x4;
+import org.lwjgl.nuklear.NkRect;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -142,5 +143,15 @@ public class Utils {
             ret += (char)dat.get(k);
         }
         return ret.trim();
+    }
+
+    public static NkRect convertVector4fToNkRect(Vector4f rect) {
+        NkRect nkrect = NkRect.create().x(rect.x).y(rect.y).w(rect.z).h(rect.w);
+        return nkrect;
+    }
+
+    public static NkRect createNkRect(float x, float y, float width, float height) {
+        NkRect nkrect = NkRect.create().x(x).y(y).w(width).h(height);
+        return nkrect;
     }
 }

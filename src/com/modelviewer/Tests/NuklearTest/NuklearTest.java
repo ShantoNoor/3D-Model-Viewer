@@ -5,10 +5,25 @@ import com.modelviewer.Renderer.Mesh.Model;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Utils.Constants;
+import com.modelviewer.Utils.Utils;
+import com.modelviewer.Window.Input.KeyListener;
 import com.modelviewer.Window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.nuklear.NkColor;
+import org.lwjgl.nuklear.NkColorf;
+import org.lwjgl.nuklear.NkVec2;
+import org.lwjgl.nuklear.Nuklear;
+import org.lwjgl.system.MemoryStack;
+
+import java.awt.image.Kernel;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_I;
+import static org.lwjgl.nuklear.Nuklear.*;
+import static org.lwjgl.nuklear.Nuklear.NK_WINDOW_TITLE;
+import static org.lwjgl.opengl.GL11.GL_VERSION;
+import static org.lwjgl.opengl.GL11.glGetString;
 
 public class NuklearTest extends Window {
     private Camera camera;
@@ -27,8 +42,9 @@ public class NuklearTest extends Window {
     }
 
     Matrix4f rotate;
-    Demo demo;
-    Calculator cal;
+
+    private NuklearLayer ui;
+    public NkColorf background;
 
     @Override
     public void setup() {
@@ -52,7 +68,6 @@ public class NuklearTest extends Window {
 
         model = new Model();
 
-        model.loadMesh("TestModels/pistol2/source/pistol.fbx");
 //        model.loadMesh("TestModels/pistol/source/pistol.fbx");
 
         camera = new Camera();
@@ -60,8 +75,16 @@ public class NuklearTest extends Window {
 
         rotate = new Matrix4f();
 
-        demo = new Demo(ctx);
-        cal = new Calculator(ctx);
+        ui = new NuklearLayer(
+                ctx,
+                "Nuklear Test",
+                Utils.createNkRect(30, 30, 230, 250),
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE | NK_WINDOW_SCALABLE
+        );
+
+        background = NkColorf.create().r(0.10f).g(0.18f).b(0.24f).a(1.0f);
+
+        ctx.style().window().fixed_background().data().color().set((byte) 44, (byte) 44, (byte) 44, (byte) 200);
     }
 
     @Override
@@ -85,10 +108,35 @@ public class NuklearTest extends Window {
 
         model.render(shaderProgram);
 
-        demo.layout(50, 50);
-        cal.layout(300, 60);
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            if(ui.begin()) {
+                nk_layout_row_dynamic(ctx, 0, 2);
+                if (nk_button_label(ctx, "Load")) {
+                    if(model.loadMesh("TestModels/pistol2/source/pistol.fbx"))
+                        camera.setPosition(new Vector3f(0.0f, 0.0f, model.getDistance()));
+                }
+                if (nk_button_label(ctx, "About")) {
+                    info.show();
+                }
 
-        setClearColor(new Vector4f(demo.background.r(), demo.background.g(), demo.background.b(), demo.background.a()));
+                nk_layout_row_dynamic(ctx, 0, 1);
+                nk_label(ctx, "background:", NK_TEXT_LEFT);
+                nk_layout_row_dynamic(ctx, 25, 1);
+                if (nk_combo_begin_color(ctx, nk_rgb_cf(background, NkColor.malloc(stack)), NkVec2.malloc(stack).set(nk_widget_width(ctx), 400))) {
+                    nk_layout_row_dynamic(ctx, 120, 1);
+                    nk_color_picker(ctx, background, NK_RGBA);
+                    nk_layout_row_dynamic(ctx, 25, 1);
+                    background
+                            .r(nk_propertyf(ctx, "#R:", 0, background.r(), 1.0f, 0.01f, 0.005f))
+                            .g(nk_propertyf(ctx, "#G:", 0, background.g(), 1.0f, 0.01f, 0.005f))
+                            .b(nk_propertyf(ctx, "#B:", 0, background.b(), 1.0f, 0.01f, 0.005f))
+                            .a(nk_propertyf(ctx, "#A:", 0, background.a(), 1.0f, 0.01f, 0.005f));
+                    nk_combo_end(ctx);
+                }
+                setClearColor(new Vector4f(background.r(), background.g(), background.b(), background.a()));
+            }
+            ui.end();
+        }
     }
 
     public static void main(String[] args) {
