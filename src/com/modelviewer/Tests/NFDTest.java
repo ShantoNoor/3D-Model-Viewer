@@ -1,12 +1,13 @@
-package com.modelviewer.Tests.NuklearTest;
+package com.modelviewer.Tests;
 
 import com.modelviewer.Camera.Camera;
 import com.modelviewer.Renderer.Mesh.Model;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Utils.Constants;
+import com.modelviewer.Utils.NFD;
 import com.modelviewer.Utils.Utils;
-import com.modelviewer.Window.Input.KeyListener;
+import com.modelviewer.Window.NuklearLayer;
 import com.modelviewer.Window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -14,18 +15,11 @@ import org.joml.Vector4f;
 import org.lwjgl.nuklear.NkColor;
 import org.lwjgl.nuklear.NkColorf;
 import org.lwjgl.nuklear.NkVec2;
-import org.lwjgl.nuklear.Nuklear;
 import org.lwjgl.system.MemoryStack;
 
-import java.awt.image.Kernel;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_I;
 import static org.lwjgl.nuklear.Nuklear.*;
-import static org.lwjgl.nuklear.Nuklear.NK_WINDOW_TITLE;
-import static org.lwjgl.opengl.GL11.GL_VERSION;
-import static org.lwjgl.opengl.GL11.glGetString;
 
-public class NuklearTest extends Window {
+public class NFDTest extends Window {
     private Camera camera;
     private ShaderProgram shaderProgram;
     private Model model;
@@ -37,7 +31,7 @@ public class NuklearTest extends Window {
 
 //    private final Calculator calc = new Calculator();
 
-    public NuklearTest(int width, int height, String title) {
+    public NFDTest(int width, int height, String title) {
         super(width, height, title);
     }
 
@@ -68,7 +62,7 @@ public class NuklearTest extends Window {
 
         model = new Model();
 
-//        model.loadMesh("TestModels/pistol/source/pistol.fbx");
+//        model.loadMesh("TestModels/Drawing7.stl");
 
         camera = new Camera();
         camera.setPosition(new Vector3f(0.0f, 0.0f, model.getDistance()));
@@ -77,7 +71,7 @@ public class NuklearTest extends Window {
 
         ui = new NuklearLayer(
                 ctx,
-                "Nuklear Test",
+                "NDF Test",
                 Utils.createNkRect(30, 30, 230, 250),
                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE | NK_WINDOW_SCALABLE
         );
@@ -112,7 +106,8 @@ public class NuklearTest extends Window {
             if(ui.begin()) {
                 nk_layout_row_dynamic(ctx, 0, 2);
                 if (nk_button_label(ctx, "Load")) {
-                    if(model.loadMesh("TestModels/pistol2/source/pistol.fbx"))
+                    String modelPath = NFD.openSingle();
+                    if(modelPath != null && model.loadMesh(modelPath))
                         camera.setPosition(new Vector3f(0.0f, 0.0f, model.getDistance()));
                 }
                 if (nk_button_label(ctx, "About")) {
@@ -140,6 +135,6 @@ public class NuklearTest extends Window {
     }
 
     public static void main(String[] args) {
-        new NuklearTest(1000, 600, "Nuklear Test").run();
+        new NFDTest(1000, 600, "NDF Test").run();
     }
 }

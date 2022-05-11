@@ -1,4 +1,4 @@
-package com.modelviewer.Tests.NuklearTest;
+package com.modelviewer.Window;
 
 import org.lwjgl.nuklear.NkContext;
 import org.lwjgl.nuklear.NkRect;

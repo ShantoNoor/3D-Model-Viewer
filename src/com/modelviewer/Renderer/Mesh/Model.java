@@ -11,7 +11,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -394,8 +393,8 @@ public class Model {
         vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals, NORMAL_BUFFER, 3, BufferDataType.STATIC);
         vbos[COLOR_BUFFER].uploadVertexAttributeData(vao, colors, COLOR_BUFFER, 4, BufferDataType.STATIC);
 
-        vbos[TANGENT_BUFFER].uploadVertexAttributeData(vao, tangents.flip(), TANGENT_BUFFER, 3, BufferDataType.STATIC);
-        vbos[BITANGENT_BUFFER].uploadVertexAttributeData(vao, bitangents.flip(), BITANGENT_BUFFER, 3, BufferDataType.STATIC);
+//        vbos[TANGENT_BUFFER].uploadVertexAttributeData(vao, tangents.flip(), TANGENT_BUFFER, 3, BufferDataType.STATIC);
+//        vbos[BITANGENT_BUFFER].uploadVertexAttributeData(vao, bitangents.flip(), BITANGENT_BUFFER, 3, BufferDataType.STATIC);
 
         ibo.uploadIndicesData(vao, indices, BufferDataType.STATIC);
         vao.unbind();

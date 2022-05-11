@@ -1,6 +1,5 @@
 package com.modelviewer.Window;
 
-import com.modelviewer.Tests.NuklearTest.NuklearLayer;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.Input.KeyListener;
@@ -308,6 +307,7 @@ abstract public class Window {
         glEnable(GL_DEPTH_TEST);
 
 //        System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     public void run() {
