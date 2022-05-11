@@ -307,7 +307,6 @@ abstract public class Window {
         glEnable(GL_DEPTH_TEST);
 
 //        System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
-        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     public void run() {

@@ -1,6 +1,7 @@
 <component name="libraryTable">
-  <library name="lwjgl-assimp-javadoc">
+  <library name="joml-1.10.4-sources">
     <CLASSES>
+      <root url="jar://$PROJECT_DIR$/LWJGL/joml-1.10.4.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-assimp-natives-linux-arm32.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-assimp-natives-linux-arm64.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-assimp-natives-linux.jar!/" />
@@ -72,8 +73,16 @@
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb-natives-windows-x86.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb-natives-windows.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-linux-arm32.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-linux-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-linux.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-macos-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-macos.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-windows-arm64.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-windows-x86.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-natives-windows.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl.jar!/" />
-      <root url="jar://$PROJECT_DIR$/LWJGL/joml-1.10.4.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-assimp-javadoc.jar!/" />
@@ -84,8 +93,11 @@
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-openal-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-opengl-javadoc.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
+      <root url="jar://$PROJECT_DIR$/LWJGL/joml-1.10.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/joml-1.10.4-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-assimp-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-glfw-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-nfd-sources.jar!/" />
@@ -94,8 +106,7 @@
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-opengl-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-sources.jar!/" />
       <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-stb-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/LWJGL/joml-1.10.4-sources.jar!/" />
-      <root url="jar://$PROJECT_DIR$/LWJGL/joml-1.10.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/LWJGL/lwjgl-tinyfd-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

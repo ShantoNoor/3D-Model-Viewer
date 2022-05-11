@@ -5,7 +5,6 @@ import com.modelviewer.Renderer.Mesh.Model;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Utils.Constants;
-import com.modelviewer.Utils.NFD;
 import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.NuklearLayer;
 import com.modelviewer.Window.Window;
@@ -18,6 +17,7 @@ import org.lwjgl.nuklear.NkVec2;
 import org.lwjgl.system.MemoryStack;
 
 import static org.lwjgl.nuklear.Nuklear.*;
+import static org.lwjgl.util.tinyfd.TinyFileDialogs.*;
 
 public class NFDTest extends Window {
     private Camera camera;
@@ -106,12 +106,15 @@ public class NFDTest extends Window {
             if(ui.begin()) {
                 nk_layout_row_dynamic(ctx, 0, 2);
                 if (nk_button_label(ctx, "Load")) {
-                    String modelPath = NFD.openSingle();
+                    CharSequence charSequence = new StringBuffer("jpg");
+                    String modelPath = tinyfd_openFileDialog("Open a 3D Model File", "", null, "", false);
                     if(modelPath != null && model.loadMesh(modelPath))
                         camera.setPosition(new Vector3f(0.0f, 0.0f, model.getDistance()));
                 }
                 if (nk_button_label(ctx, "About")) {
                     info.show();
+//                    tinyfd_notifyPopup("PopUp", "Hi", "warning");
+                    System.out.println(tinyfd_messageBox("box", "hi", "yesno", "warning", true));
                 }
 
                 nk_layout_row_dynamic(ctx, 0, 1);
