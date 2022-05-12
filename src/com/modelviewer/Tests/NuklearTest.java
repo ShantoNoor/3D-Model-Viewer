@@ -6,7 +6,7 @@ import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
-import com.modelviewer.Window.NuklearLayer;
+import com.modelviewer.Window.NuklearLayer.NuklearLayer;
 import com.modelviewer.Window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

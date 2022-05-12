@@ -6,7 +6,9 @@ import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Renderer.Texture;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
-import com.modelviewer.Window.NuklearLayer;
+import com.modelviewer.Window.NuklearLayer.NuklearLayer;
+import com.modelviewer.Window.NuklearLayer.ApplyTheme;
+import com.modelviewer.Window.NuklearLayer.NuklearLayerTheme;
 import com.modelviewer.Window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -78,7 +80,8 @@ public class NFDTest extends Window {
 
         background = NkColorf.create().r(0.10f).g(0.18f).b(0.24f).a(1.0f);
 
-        ctx.style().window().fixed_background().data().color().set((byte) 44, (byte) 44, (byte) 44, (byte) 200);
+        ApplyTheme.apply(ctx, NuklearLayerTheme.RED);
+//        ctx.style().window().fixed_background().data().color().set((byte) 44, (byte) 44, (byte) 44, (byte) 200);
     }
 
     @Override

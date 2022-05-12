@@ -1,4 +1,4 @@
-package com.modelviewer.Window;
+package com.modelviewer.Window.NuklearLayer;
 
 import org.lwjgl.nuklear.NkContext;
 import org.lwjgl.nuklear.NkRect;
