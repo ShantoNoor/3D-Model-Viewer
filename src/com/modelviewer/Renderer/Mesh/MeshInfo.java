@@ -18,7 +18,7 @@ public class MeshInfo {
         this.baseVertex = 0;
         this.baseIndex = 0;
         this.materialIndex = 0;
-        this.modelTransform = new Matrix4f();
+        this.modelTransform = new Matrix4f().identity();
         this.min = new Vector3f();
         this.max = new Vector3f();
     }

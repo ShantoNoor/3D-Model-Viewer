@@ -91,18 +91,20 @@ public class NFDTest extends Window {
         camera.keyboardUpdate(dt);
 
         shaderProgram.safeUpload("projection", projectionMatrix);
-
         shaderProgram.safeUpload("view", camera.getViewMatrix());
         shaderProgram.safeUpload("camPos", camera.getPosition());
-        shaderProgram.safeUpload("lightF", new Vector3f(100, 100.0f, 100.0f));
+        shaderProgram.safeUpload("lightDir", new Vector3f(0, 110.0f, -110.0f));
         shaderProgram.safeUpload("rotate", rotate.rotate(dt, Constants.Y_AXIS));
 
-        baseColor.bind(shaderProgram, "baseColor", 0);
-        normalMap.bind(shaderProgram, "normalMap", 1);
-        aoMap.bind(shaderProgram, "aoMap", 2);
-        metalnessMap.bind(shaderProgram, "metalnessMap", 3);
-        roughnessMap.bind(shaderProgram, "roughnessMap", 4);
+//        baseColor.bind(shaderProgram, "baseColor", 0);
+//        normalMap.bind(shaderProgram, "normalMap", 1);
+//        aoMap.bind(shaderProgram, "aoMap", 2);
+//        metalnessMap.bind(shaderProgram, "metalnessMap", 3);
+//        roughnessMap.bind(shaderProgram, "roughnessMap", 4);
 
+        shaderProgram.safeUpload("shine", value[0]);
+
+        model.updateRotation(dt);
         model.render(shaderProgram);
 
         try(MemoryStack stack = MemoryStack.stackPush()) {

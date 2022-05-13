@@ -203,7 +203,7 @@ public class Camera {
     }
 
     private void resetCamera() {
-        position = defaultPosition;
+        position = new Vector3f(defaultPosition);
         UP = new Vector3f(0.0f, 1.0f, 0.0f);
         RIGHT = new Vector3f(1.0f, 0.0f, 0.0f);
         viewDirection = new Vector3f(0.0f, 0.0f, -1.0f);

@@ -2,7 +2,9 @@ package com.modelviewer.Renderer.Mesh;
 
 import com.modelviewer.Renderer.*;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
+import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
+import com.modelviewer.Window.Input.KeyListener;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -10,10 +12,12 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
+import org.lwjgl.glfw.GLFW;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL32.glDrawElementsBaseVertex;
 
@@ -47,6 +51,9 @@ public class Model {
 
     private boolean modelSuccessfullyLoaded = false;
 
+    private boolean enableRotation = false;
+    private Vector3f axisOfRotation = Constants.Y_AXIS;
+
     private Vector3f min = new Vector3f(Float.MAX_VALUE);
     private Vector3f max = new Vector3f(Float.MIN_VALUE);
     private Vector3f origin = new Vector3f(0.0f);
@@ -54,7 +61,7 @@ public class Model {
     private float minDistance = 15.0f;
     private float maxDistance = 30.0f;
 
-    private Matrix4f transform = new Matrix4f();
+    private Matrix4f transform = new Matrix4f().identity();
 
     public Model() { }
 
@@ -432,5 +439,27 @@ public class Model {
 
     public void rotate(float angle, Vector3f axis) {
         new Matrix4f().rotate(angle, axis).mul(transform, transform);
+    }
+
+    public void updateRotation(float dt) {
+        if(KeyListener.isKeyPressed(GLFW_KEY_N)) {
+            if(enableRotation) enableRotation = false;
+            else enableRotation = true;
+        }
+
+        if(KeyListener.isKeyPressed(GLFW_KEY_X)) {
+            axisOfRotation = Constants.X_AXIS;
+        }
+
+        if(KeyListener.isKeyPressed(GLFW_KEY_Y)) {
+            axisOfRotation = Constants.Y_AXIS;
+        }
+        if(KeyListener.isKeyPressed(GLFW_KEY_Z)) {
+            axisOfRotation = Constants.Z_AXIS;
+        }
+
+        if(enableRotation) {
+            rotate(dt, axisOfRotation);
+        }
     }
 }
