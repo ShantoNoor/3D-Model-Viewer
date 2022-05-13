@@ -13,6 +13,7 @@ uniform sampler2D roughnessMap;
 
 uniform int flipTexCordX;
 uniform int flipTexCordY;
+uniform int haveTangents;
 
 out vec4 finalColor;
 
@@ -22,13 +23,16 @@ in vec3 light;
 
 void main()
 {
-//    vec3 N = fNor;
+    vec3 N = fNor;
     vec2 texCod = fTex;
 
     if(flipTexCordX > 0) { texCod.x = 1 - texCod.x; }
     if(flipTexCordY > 0) { texCod.y = 1 - texCod.y; }
 
-    vec3 N = TBN * normalize( (2 * texture(normalMap, texCod).rgb - 1) );
+    if(haveTangents > 0) {
+        N = TBN * normalize((2 * texture(normalMap, texCod).rgb - 1));
+    }
+
     vec3 L = normalize(light);
     vec3 V = normalize(cp - fPos);
 

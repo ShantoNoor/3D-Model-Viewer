@@ -37,6 +37,8 @@ public class Model {
     private static final int BITANGENT_BUFFER = 5;
     private static final int NUMBER_OF_BUFFER = 6;
 
+    private int haveTangents;
+
     private VAO vao = new VAO();
     private VBO[] vbos = new VBO[NUMBER_OF_BUFFER];
     private IBO ibo = new IBO();
@@ -235,6 +237,7 @@ public class Model {
         ibo.bind();
 
         shaderProgram.upload("transform", transform);
+        shaderProgram.upload("haveTangents", haveTangents);
 
         if(modelSuccessfullyLoaded) {
             for (int i = 0; i < meshes.length; ++i) {
@@ -361,22 +364,32 @@ public class Model {
             meshes[j].max.z = boundingBox.mMax().z();
 
             AIVector3D.Buffer vertexTangents = mesh.mTangents();
-            if(vertexTangents != null)
-                for(int i = 0; i < vertexTangents.limit(); i++) {
+            if(vertexTangents != null) {
+                haveTangents = 1;
+
+                for (int i = 0; i < vertexTangents.limit(); i++) {
                     AIVector3D vertexTangent = vertexTangents.get(i);
                     tangents.put(vertexTangent.x());
                     tangents.put(vertexTangent.y());
                     tangents.put(vertexTangent.z());
                 }
+            } else {
+                haveTangents = 0;
+            }
 
             AIVector3D.Buffer vertexBitangents = mesh.mBitangents();
-            if(vertexBitangents != null)
-                for(int i = 0; i < vertexBitangents.limit(); i++) {
+            if(vertexBitangents != null) {
+                haveTangents = 1;
+
+                for (int i = 0; i < vertexBitangents.limit(); i++) {
                     AIVector3D vertexBitangent = vertexBitangents.get(i);
                     bitangents.put(vertexBitangent.x());
                     bitangents.put(vertexBitangent.y());
                     bitangents.put(vertexBitangent.z());
                 }
+            } else {
+                haveTangents = 0;
+            }
         }
     }
 
@@ -393,8 +406,10 @@ public class Model {
         vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals, NORMAL_BUFFER, 3, BufferDataType.STATIC);
         vbos[COLOR_BUFFER].uploadVertexAttributeData(vao, colors, COLOR_BUFFER, 4, BufferDataType.STATIC);
 
-//        vbos[TANGENT_BUFFER].uploadVertexAttributeData(vao, tangents.flip(), TANGENT_BUFFER, 3, BufferDataType.STATIC);
-//        vbos[BITANGENT_BUFFER].uploadVertexAttributeData(vao, bitangents.flip(), BITANGENT_BUFFER, 3, BufferDataType.STATIC);
+        if(haveTangents > 0) {
+            vbos[TANGENT_BUFFER].uploadVertexAttributeData(vao, tangents.flip(), TANGENT_BUFFER, 3, BufferDataType.STATIC);
+            vbos[BITANGENT_BUFFER].uploadVertexAttributeData(vao, bitangents.flip(), BITANGENT_BUFFER, 3, BufferDataType.STATIC);
+        }
 
         ibo.uploadIndicesData(vao, indices, BufferDataType.STATIC);
         vao.unbind();

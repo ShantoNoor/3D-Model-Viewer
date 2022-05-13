@@ -15,6 +15,8 @@ uniform mat4 rotate;
 uniform vec3 camPos;
 uniform vec3 lightF;
 
+uniform int haveTangents;
+
 out vec2 fTex;
 out vec3 fNor;
 out vec4 fCol;
@@ -34,14 +36,16 @@ void main()
 
     fNor = normalize(modelForNormal * aNor);
 
-    fPos = vec3(model * vec4(aPos, 1.0f));
+    fPos = vec3(view * model * vec4(aPos, 1.0f));
     cp = camPos;
     light = lightF;
 
     gl_Position =  projection * view  * model * vec4(aPos, 1.0f);;
 
-    vec3 T = normalize(modelForNormal * aTan);
-    vec3 B = normalize(modelForNormal * aBtan);
-    vec3 N = normalize(modelForNormal * aNor);
-    TBN = transpose(mat3(T, B, N));
+    if(haveTangents > 0) {
+        vec3 T = normalize(modelForNormal * aTan);
+        vec3 B = normalize(modelForNormal * aBtan);
+        vec3 N = normalize(modelForNormal * aNor);
+        TBN = transpose(mat3(T, B, N));
+    }
 }

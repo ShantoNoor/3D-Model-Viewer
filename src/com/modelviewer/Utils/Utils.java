@@ -3,7 +3,10 @@ package com.modelviewer.Utils;
 import org.joml.*;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.assimp.AIMatrix4x4;
+import org.lwjgl.nuklear.NkColor;
 import org.lwjgl.nuklear.NkRect;
+import org.lwjgl.nuklear.NkVec2;
+import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -153,5 +156,14 @@ public class Utils {
     public static NkRect createNkRect(float x, float y, float width, float height) {
         NkRect nkrect = NkRect.create().x(x).y(y).w(width).h(height);
         return nkrect;
+    }
+
+    public static NkColor createNkColor(int r, int g, int b, int a) {
+        return NkColor.create().set((byte) r, (byte) g, (byte) b, (byte) a);
+    }
+
+    public static NkVec2 createNkVec2(float x, float y) {
+        NkVec2 vec2 = NkVec2.create().x(x).y(y);
+        return vec2;
     }
 }
