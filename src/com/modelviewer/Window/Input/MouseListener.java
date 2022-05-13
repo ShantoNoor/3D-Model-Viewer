@@ -92,6 +92,9 @@ public class MouseListener {
     public static boolean isDraggingOverMainGlfwWindow() {
         return get().isDragging & get().isAboveMainGlfwWindow;
     }
+    public static boolean isAnyClickOverMainGlfwWindow() {
+        return get().isAboveMainGlfwWindow && (get().mouseButtonPressed[0] | get().mouseButtonPressed[1] | get().mouseButtonPressed[2]);
+    }
 
     public static boolean isScrolling() {
         return get().isScrolling;

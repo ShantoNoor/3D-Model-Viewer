@@ -41,6 +41,5 @@ void main()
         vec3 B = normalize(modelForNormal * aBtan);
         vec3 N = normalize(modelForNormal * aNor);
         TBN = mat3(T, B, N);
-        // TBN = transpose(TBN);
     }
 }

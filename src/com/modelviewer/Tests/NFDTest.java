@@ -9,6 +9,7 @@ import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.NuklearLayer.NuklearLayer;
 import com.modelviewer.Window.NuklearLayer.ApplyTheme;
 import com.modelviewer.Window.NuklearLayer.NuklearLayerTheme;
+import com.modelviewer.Window.NuklearLayer.SideBar;
 import com.modelviewer.Window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -38,7 +39,9 @@ public class NFDTest extends Window {
     Matrix4f rotate;
 
     private NuklearLayer ui;
+        private SideBar sidebar;
     public NkColorf background;
+    private int sideBarWidth = 300;
 
     @Override
     public void setup() {
@@ -76,6 +79,13 @@ public class NFDTest extends Window {
                 NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE | NK_WINDOW_SCALABLE
         );
 
+        sidebar = new SideBar(
+                ctx,
+                "Side Bar",
+                Utils.createNkRect(width-sideBarWidth, 0, sideBarWidth, height),
+                0
+        );
+
         background = NkColorf.create().r(0.10f).g(0.18f).b(0.24f).a(1.0f);
 //
         ApplyTheme.apply(ctx, NuklearLayerTheme.RED);
@@ -93,14 +103,14 @@ public class NFDTest extends Window {
         shaderProgram.safeUpload("projection", projectionMatrix);
         shaderProgram.safeUpload("view", camera.getViewMatrix());
         shaderProgram.safeUpload("camPos", camera.getPosition());
-        shaderProgram.safeUpload("lightDir", new Vector3f(0, 110.0f, -110.0f));
+        shaderProgram.safeUpload("lightDir", new Vector3f(0, 110.0f, 110.0f));
         shaderProgram.safeUpload("rotate", rotate.rotate(dt, Constants.Y_AXIS));
 
-//        baseColor.bind(shaderProgram, "baseColor", 0);
-//        normalMap.bind(shaderProgram, "normalMap", 1);
-//        aoMap.bind(shaderProgram, "aoMap", 2);
-//        metalnessMap.bind(shaderProgram, "metalnessMap", 3);
-//        roughnessMap.bind(shaderProgram, "roughnessMap", 4);
+        baseColor.bind(shaderProgram, "baseColor", 0);
+        normalMap.bind(shaderProgram, "normalMap", 1);
+        aoMap.bind(shaderProgram, "aoMap", 2);
+        metalnessMap.bind(shaderProgram, "metalnessMap", 3);
+        roughnessMap.bind(shaderProgram, "roughnessMap", 4);
 
         shaderProgram.safeUpload("shine", value[0]);
 
@@ -119,8 +129,17 @@ public class NFDTest extends Window {
                 if (nk_button_label(ctx, "About")) {
                     info.show();
 //                    tinyfd_notifyPopup("PopUp", "Hi", "warning");
-                    System.out.println(tinyfd_messageBox("box", "hi", "yesno", "warning", true));
+//                    System.out.println(tinyfd_messageBox("box", "hi", "yesno", "warning", true));
                 }
+
+                nk_layout_row_dynamic(ctx, 20, 2);
+                if(nk_button_label(ctx, "Show SideBar")) {
+                    sidebar.show = true;
+                }
+                if(nk_button_label(ctx, "Close SideBar")) {
+                    sidebar.show = false;
+                }
+
 //
 //                nk_layout_row_dynamic(ctx, 20, 1);
 //                nk_label(ctx, "background:", NK_TEXT_LEFT);
@@ -178,6 +197,15 @@ public class NFDTest extends Window {
             ui.end();
         }
 //        System.out.println(value[0]);
+
+        sidebar.update(dt);
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            if (sidebar.begin()) {
+                model.ui(ctx);
+
+            }
+            sidebar.end();
+        }
     }
 
     public static void main(String[] args) {

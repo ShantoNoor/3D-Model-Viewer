@@ -25,26 +25,28 @@ in vec3 LD;
 
 void main()
 {
-    vec3 N = normalize(fNor);
+    vec3 N = fNor;
 
     vec2 texCod = fTex;
     if(flipTexCordX > 0) { texCod.x = 1 - texCod.x; }
     if(flipTexCordY > 0) { texCod.y = 1 - texCod.y; }
 
-    if(haveTangents > 0) {
-        N = TBN * normalize((2 * texture(normalMap, texCod).rgb - 1));
-    }
+//    if(haveTangents > 0) {
+//        N = TBN * normalize((2 * texture(normalMap, texCod).rgb - 1));
+//    }
 
+    N = normalize(N);
     vec3 L = normalize(LD);
     vec3 V = normalize(-fPos);
+    vec3 H = normalize(L + V);
 
     float lightFactor = max(dot(N, L), 0);
-    float specularFactor = max(dot(reflect(-L, N), V), 0.0);
-    specularFactor = pow(specularFactor, shine);
+    float specularFactor = 0;
+    if(lightFactor > 0)
+        specularFactor = pow(max(dot(reflect(-L, N), H), 0.0), shine);
 
     finalColor = vec4(0.15f, 0.15f, 0.15f, 1.0f) * lightFactor + specularFactor;
-//    if(fCol != vec4(0.0f)) color = fCol;
-//
+
 //    vec4 finalBaseColor = texture(baseColor, texCod) * texture(aoMap, texCod).r;
-//    finalColor = finalBaseColor * lightFactor + specularFactor * (1-texture(roughnessMap, texCod).r) * texture(metalnessMap, texCod).r + finalBaseColor * 0.5;
+//    finalColor = finalBaseColor * lightFactor + specularFactor * (1-texture(roughnessMap, texCod).r) * texture(metalnessMap, texCod).r + finalBaseColor * 0.2;
 }

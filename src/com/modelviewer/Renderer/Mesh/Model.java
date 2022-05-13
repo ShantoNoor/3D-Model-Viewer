@@ -4,7 +4,6 @@ import com.modelviewer.Renderer.*;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
-import com.modelviewer.Window.Input.KeyListener;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -12,12 +11,12 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.nuklear.NkContext;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.nuklear.Nuklear.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL32.glDrawElementsBaseVertex;
 
@@ -53,6 +52,7 @@ public class Model {
 
     private boolean enableRotation = false;
     private Vector3f axisOfRotation = Constants.Y_AXIS;
+    private int rotationAxis = 1;
 
     private Vector3f min = new Vector3f(Float.MAX_VALUE);
     private Vector3f max = new Vector3f(Float.MIN_VALUE);
@@ -442,24 +442,38 @@ public class Model {
     }
 
     public void updateRotation(float dt) {
-        if(KeyListener.isKeyPressed(GLFW_KEY_N)) {
-            if(enableRotation) enableRotation = false;
-            else enableRotation = true;
-        }
-
-        if(KeyListener.isKeyPressed(GLFW_KEY_X)) {
-            axisOfRotation = Constants.X_AXIS;
-        }
-
-        if(KeyListener.isKeyPressed(GLFW_KEY_Y)) {
-            axisOfRotation = Constants.Y_AXIS;
-        }
-        if(KeyListener.isKeyPressed(GLFW_KEY_Z)) {
-            axisOfRotation = Constants.Z_AXIS;
-        }
-
         if(enableRotation) {
             rotate(dt, axisOfRotation);
+        }
+    }
+
+    public void ui(NkContext ctx) {
+        nk_layout_row_dynamic(ctx, 120, 1);
+        if (nk_group_begin_titled(ctx, "ModelSpin", "Model Spin", NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
+            nk_layout_row_dynamic(ctx, 25, 2);
+            if (nk_option_label(ctx, "Spin On", enableRotation)) {
+                enableRotation = true;
+            }
+            if (nk_option_label(ctx, "Spin Off", !enableRotation)) {
+                enableRotation = false;
+            }
+            nk_layout_row_dynamic(ctx, 20, 1);
+            nk_text(ctx, "Rotation Of Axis:", NK_TEXT_LEFT);
+
+            nk_layout_row_dynamic(ctx, 20, 3);
+            if (nk_option_label(ctx, "X Axis", rotationAxis == 0)) {
+                axisOfRotation = Constants.X_AXIS;
+                rotationAxis = 0;
+            }
+            if (nk_option_label(ctx, "Y Axis", rotationAxis == 1)) {
+                axisOfRotation = Constants.Y_AXIS;
+                rotationAxis = 1;
+            }
+            if (nk_option_label(ctx, "Z Axis", rotationAxis == 2)) {
+                axisOfRotation = Constants.Z_AXIS;
+                rotationAxis = 2;
+            }
+            nk_group_end(ctx);
         }
     }
 }

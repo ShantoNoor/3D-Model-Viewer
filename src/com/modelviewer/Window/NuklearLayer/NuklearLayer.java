@@ -7,10 +7,10 @@ import org.lwjgl.nuklear.Nuklear;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class NuklearLayer {
-    private NkContext ctx;
-    private NkRect rect;
-    private String title;
-    private int flags;
+    protected NkContext ctx;
+    protected NkRect rect;
+    protected String title;
+    protected int flags;
 
     public NuklearLayer(NkContext ctx, String title, NkRect rect, int flags) {
         this.ctx = ctx;
