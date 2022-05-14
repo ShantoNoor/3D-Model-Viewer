@@ -17,7 +17,7 @@ uniform int flipTexCordY;
 uniform int haveTangents;
 
 
-uniform float shine;
+uniform float Shineness;
 out vec4 finalColor;
 
 in mat3 TBN;
@@ -43,7 +43,7 @@ void main()
     float lightFactor = max(dot(N, L), 0);
     float specularFactor = 0;
     if(lightFactor > 0)
-        specularFactor = pow(max(dot(reflect(-L, N), H), 0.0), shine);
+        specularFactor = pow(max(dot(reflect(-L, N), H), 0.0), Shineness);
 
     finalColor = vec4(0.15f, 0.15f, 0.15f, 1.0f) * lightFactor + specularFactor;
 

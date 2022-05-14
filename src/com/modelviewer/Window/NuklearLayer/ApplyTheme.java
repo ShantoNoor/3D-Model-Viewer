@@ -9,12 +9,15 @@ import java.nio.ByteBuffer;
 import static org.lwjgl.nuklear.Nuklear.*;
 
 public class ApplyTheme {
+    public static NuklearLayerTheme appliedTheme = NuklearLayerTheme.DEFAULT;
+
     public static void apply(NkContext context, NuklearLayerTheme nuklearLayerTheme) {
         try(MemoryStack stack = MemoryStack.stackPush()) {
             int size = NkColor.SIZEOF * NK_COLOR_COUNT;
             ByteBuffer buffer = stack.calloc(size);
             NkColor.Buffer colors = new NkColor.Buffer(buffer);
             if(nuklearLayerTheme == NuklearLayerTheme.WHITE) {
+                appliedTheme = NuklearLayerTheme.WHITE;
                 colors.put(NK_COLOR_TEXT, createColor(stack, 70, 70, 70, 255));
                 colors.put(NK_COLOR_WINDOW, createColor(stack, 175, 175, 175, 255));
                 colors.put(NK_COLOR_HEADER, createColor(stack, 175, 175, 175, 255));
@@ -44,6 +47,7 @@ public class ApplyTheme {
                 colors.put(NK_COLOR_SCROLLBAR_CURSOR_ACTIVE, createColor(stack, 160, 160, 160, 255));
                 colors.put(NK_COLOR_TAB_HEADER, createColor(stack, 180, 180, 180, 255));
             } else if(nuklearLayerTheme == NuklearLayerTheme.RED) {
+                appliedTheme = NuklearLayerTheme.RED;
                 colors.put(NK_COLOR_TEXT, createColor(stack, 190, 190, 190, 255));
                 colors.put(NK_COLOR_WINDOW, createColor(stack, 30, 33, 40, 215));
                 colors.put(NK_COLOR_HEADER, createColor(stack, 181, 45, 69, 220));
@@ -73,6 +77,7 @@ public class ApplyTheme {
                 colors.put(NK_COLOR_SCROLLBAR_CURSOR_ACTIVE, createColor(stack, 75, 95, 105, 255));
                 colors.put(NK_COLOR_TAB_HEADER, createColor(stack, 181, 45, 69, 220));
             } else if(nuklearLayerTheme == NuklearLayerTheme.BLUE) {
+                appliedTheme = NuklearLayerTheme.BLUE;
                 colors.put(NK_COLOR_TEXT, createColor(stack, 20, 20, 20, 255));
                 colors.put(NK_COLOR_WINDOW, createColor(stack, 202, 212, 214, 215));
                 colors.put(NK_COLOR_HEADER, createColor(stack, 137, 182, 224, 220));
@@ -102,6 +107,7 @@ public class ApplyTheme {
                 colors.put(NK_COLOR_SCROLLBAR_CURSOR_ACTIVE, createColor(stack, 75, 95, 105, 255));
                 colors.put(NK_COLOR_TAB_HEADER, createColor(stack, 156, 193, 220, 255));
             } else if(nuklearLayerTheme == NuklearLayerTheme.DARK) {
+                appliedTheme = NuklearLayerTheme.DARK;
                 colors.put(NK_COLOR_TEXT, createColor(stack, 210, 210, 210, 255));
                 colors.put(NK_COLOR_WINDOW, createColor(stack, 57, 67, 71, 215));
                 colors.put(NK_COLOR_HEADER, createColor(stack, 51, 51, 56, 220));
@@ -131,9 +137,11 @@ public class ApplyTheme {
                 colors.put(NK_COLOR_SCROLLBAR_CURSOR_ACTIVE, createColor(stack, 58, 93, 121, 255));
                 colors.put(NK_COLOR_TAB_HEADER, createColor(stack, 48, 83, 111, 255));
             } else if(nuklearLayerTheme == NuklearLayerTheme.DEFAULT) {
+                appliedTheme = NuklearLayerTheme.DEFAULT;
                 nk_style_default(context);
                 return;
             }
+            System.out.println("app");
             nk_style_from_table(context, colors);
         }
     }

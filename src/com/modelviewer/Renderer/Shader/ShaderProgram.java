@@ -2,6 +2,7 @@ package com.modelviewer.Renderer.Shader;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -124,6 +125,18 @@ public class ShaderProgram {
 
     public void upload(String varName, int value) {
         glUniform1i(getVarLocation(varName), value);
+    }
+
+    public void safeUpload(String varName, Vector4f vec4) {
+        bind();
+        upload(varName, vec4);
+        unbind();
+    }
+
+    public void upload(String varName, Vector4f vec4) {
+        FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
+        vec4.get(buffer);
+        glUniform3fv(getVarLocation(varName), buffer);
     }
 
     public void clear() {

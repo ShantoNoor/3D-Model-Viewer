@@ -447,7 +447,7 @@ public class Model {
         }
     }
 
-    public void ui(NkContext ctx) {
+    public void renderUi(NkContext ctx) {
         nk_layout_row_dynamic(ctx, 120, 1);
         if (nk_group_begin_titled(ctx, "ModelSpin", "Model Spin", NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
             nk_layout_row_dynamic(ctx, 25, 2);

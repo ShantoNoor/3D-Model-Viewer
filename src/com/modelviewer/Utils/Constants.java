@@ -1,5 +1,6 @@
 package com.modelviewer.Utils;
 
+import com.modelviewer.Renderer.Texture;
 import org.joml.Vector3f;
 
 import static java.lang.Math.PI;
@@ -17,4 +18,6 @@ public class Constants {
     public static int bitangentSize = 3;
     public static int colorSize = 3;
     public static int texCoordSize = 2;
+
+    public static Texture nullTexture;
 }

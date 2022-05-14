@@ -4,7 +4,9 @@ import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.Input.KeyListener;
 import com.modelviewer.Window.Input.MouseListener;
+import com.modelviewer.Window.NuklearLayer.ApplyTheme;
 import com.modelviewer.Window.NuklearLayer.NuklearLayer;
+import com.modelviewer.Window.NuklearLayer.NuklearLayerTheme;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
@@ -685,8 +687,8 @@ abstract public class Window {
 
         info = new NuklearLayer(ctx,
                 "About",
-                Utils.createNkRect(10, height - 10 - 170, 300, 170),
-                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_CLOSABLE
+                Utils.createNkRect((width-300)/2, (height-300)/2, 300, 200),
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_CLOSABLE | NK_WINDOW_NO_SCROLLBAR
                 );
 
         while (!glfwWindowShouldClose(glfwWindow)) {
@@ -704,16 +706,37 @@ abstract public class Window {
 
             if(!nk_window_is_closed(ctx, "About")) {
                 if(info.begin()) {
-                    nk_layout_row_dynamic(ctx, 0, 1);
+                    nk_layout_row_dynamic(ctx, 20, 1);
                     String fps = "FPS: " + Integer.toString((int) (1 / dt));
                     nk_text(ctx, fps, NK_TEXT_ALIGN_CENTERED);
 
-                    nk_layout_row_dynamic(ctx, 0, 1);
+                    nk_layout_row_dynamic(ctx, 20, 1);
                     nk_text(ctx, "3D Model Viewer", NK_TEXT_ALIGN_CENTERED);
 
-                    nk_layout_row_dynamic(ctx, 0, 1);
+                    nk_layout_row_dynamic(ctx, 20, 1);
                     String openglVersion = "OpenGL Version: " + glGetString(GL_VERSION);
                     nk_text(ctx, openglVersion, NK_TEXT_ALIGN_CENTERED);
+
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "Apply Theme", NK_TEXT_ALIGN_CENTERED);
+
+                    nk_layout_row_dynamic(ctx, 20, 3);
+                    if(nk_option_label(ctx, "Default", ApplyTheme.appliedTheme == NuklearLayerTheme.DEFAULT)) {
+                        ApplyTheme.apply(ctx, NuklearLayerTheme.DEFAULT);
+                    }
+                    if(nk_option_label(ctx, "White", ApplyTheme.appliedTheme == NuklearLayerTheme.WHITE)) {
+                        ApplyTheme.apply(ctx, NuklearLayerTheme.WHITE);
+                    }
+                    if(nk_option_label(ctx, "Red", ApplyTheme.appliedTheme == NuklearLayerTheme.RED)) {
+                        ApplyTheme.apply(ctx, NuklearLayerTheme.RED);
+                    }
+                    nk_layout_row_dynamic(ctx, 20, 3);
+                    if(nk_option_label(ctx, "Blue", ApplyTheme.appliedTheme == NuklearLayerTheme.BLUE)) {
+                        ApplyTheme.apply(ctx, NuklearLayerTheme.BLUE);
+                    }
+                    if(nk_option_label(ctx, "Dark", ApplyTheme.appliedTheme == NuklearLayerTheme.DARK)) {
+                        ApplyTheme.apply(ctx, NuklearLayerTheme.DARK);
+                    }
                 }
                 nk_end(ctx);
             }
