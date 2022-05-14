@@ -9,10 +9,10 @@ import static org.lwjgl.nuklear.Nuklear.nk_layout_row_end;
 public class NuklearFloat {
     private NkContext ctx;
     private float[] value = new float[1];
-    private String name;
+    private String name, shaderVarName;
     float minValue, maxValue, step, inc_per_pixel;
 
-    public NuklearFloat(NkContext ctx, String name, float value, float minValue, float maxValue, float step, float inc_per_pixel) {
+    public NuklearFloat(NkContext ctx, String name, float value, float minValue, float maxValue, float step, float inc_per_pixel, String shaderVarName) {
         this.ctx = ctx;
         this.name = name;
         this.value[0] = value;
@@ -20,6 +20,7 @@ public class NuklearFloat {
         this.maxValue = maxValue;
         this.step = step;
         this.inc_per_pixel = inc_per_pixel;
+        this.shaderVarName = shaderVarName;
     }
 
     public float get() {
@@ -36,7 +37,7 @@ public class NuklearFloat {
             nk_layout_row_dynamic(ctx, 20, 1);
             nk_label(ctx, name + ":", NK_TEXT_LEFT);
             nk_layout_row_begin(ctx, NK_STATIC, 20, 2);
-            nk_layout_row_push(ctx, nk_window_get_width(ctx) - 115);
+            nk_layout_row_push(ctx, nk_window_get_width(ctx) - 125);
             nk_slider_float(ctx, minValue, value, maxValue, step);
             nk_layout_row_push(ctx, 80.0f);
             nk_property_float(ctx, "", minValue, value, maxValue, step, inc_per_pixel);
@@ -46,10 +47,10 @@ public class NuklearFloat {
     }
 
     public void upload(ShaderProgram shaderProgram) {
-        shaderProgram.upload(name, value[0]);
+        shaderProgram.upload(shaderVarName, value[0]);
     }
 
     public void safeUpload(ShaderProgram shaderProgram) {
-        shaderProgram.safeUpload(name, value[0]);
+        shaderProgram.safeUpload(shaderVarName, value[0]);
     }
 }

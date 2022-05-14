@@ -2,6 +2,7 @@ package com.modelviewer.Utils;
 
 import org.joml.*;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.assimp.AIColor4D;
 import org.lwjgl.assimp.AIMatrix4x4;
 import org.lwjgl.nuklear.NkColor;
 import org.lwjgl.nuklear.NkRect;
@@ -165,5 +166,9 @@ public class Utils {
     public static NkVec2 createNkVec2(float x, float y) {
         NkVec2 vec2 = NkVec2.create().x(x).y(y);
         return vec2;
+    }
+
+    public static Vector4f convertAIColor4DToVector4f(AIColor4D color4D) {
+        return new Vector4f(color4D.r(), color4D.g(), color4D.b(), color4D.a());
     }
 }

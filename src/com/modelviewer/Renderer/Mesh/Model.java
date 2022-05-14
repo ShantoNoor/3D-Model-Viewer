@@ -113,25 +113,10 @@ public class Model {
 
                 if(key.equals(Assimp.AI_MATKEY_NAME)) {
                     System.out.println(Utils.convertByteBufferToString(property.mData()));
-                }
-
-                if(key.equals(Assimp._AI_MATKEY_TEXTURE_BASE)) {
-                    System.out.println(Assimp.TextureTypeToString(property.mSemantic()) + ": " + Utils.convertByteBufferToString(property.mData()));
-                }
-
-//                if(key.equals(Assimp.ai_AI_MATKEY_GLTF_MAPPINGFILTER_MAG_BASE)) {
-//                    System.out.println(Utils.convertByteBufferToString(property.mData()));
-//                }
-
-//                System.out.println("Material: (" + i + ", " + j + "): ");
-                if(key.equals(Assimp.AI_MATKEY_GLOSSINESS_FACTOR)) {
+                } else if(key.equals(Assimp.AI_MATKEY_GLOSSINESS_FACTOR)) {
                     System.out.println("GLOSSINESS_FACTOR: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_OPACITY)) {
-                    System.out.println("OPACITY: " + property.mData().getFloat());
                 } else if(key.equals(Assimp.AI_MATKEY_REFLECTIVITY)) {
                     System.out.println("REFLECTIVITY: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_CLEARCOAT_FACTOR)) {
-                    System.out.println("CLEARCOAT_FACTOR: " + property.mData().getFloat());
                 } else if(key.equals(Assimp.AI_MATKEY_METALLIC_FACTOR)) {
                     System.out.println("METALLIC_FACTOR: " + property.mData().getFloat());
                 } else if(key.equals(Assimp.AI_MATKEY_EMISSIVE_INTENSITY)) {
@@ -140,42 +125,17 @@ public class Model {
                     System.out.println("ROUGHNESS_FACTOR: " + property.mData().getFloat());
                 } else if(key.equals(Assimp.AI_MATKEY_SHININESS)) {
                     System.out.println("SHININESS: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_USE_EMISSIVE_MAP)) {
-                    System.out.println("EMISSIVE_MAP: ");
-//                    System.out.println("EMISSIVE_MAP: " + property.mData().getChar());
-                } else if(key.equals(Assimp.AI_MATKEY_USE_COLOR_MAP)) {
-                    System.out.println("COLOR_MAP: ");
-//                    System.out.println("COLOR_MAP: " + property.mData().getChar());
-                } else if(key.equals(Assimp.AI_MATKEY_USE_ROUGHNESS_MAP)) {
-                    System.out.println("ROUGHNESS_MAP: ");
-//                    System.out.println("ROUGHNESS_MAP: " + property.mData().getChar());
-                } else if(key.equals(Assimp.AI_MATKEY_USE_AO_MAP)) {
-                    System.out.println("AO_MAP: ");
-//                    System.out.println("AO_MAP: " + property.mData().getChar());
-                } else if(key.equals(Assimp.AI_MATKEY_USE_METALLIC_MAP)) {
-                    System.out.println("METALLIC_MAP: ");
-//                    System.out.println("METALLIC_MAP: " + property.mData().getChar());
+                } else if(key.equals(Assimp.AI_MATKEY_COLOR_SPECULAR)) {
+                    AIColor4D color4D = AIColor4D.create();
+                    Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR, 0, 0, color4D);
+                    System.out.println("Specular Color: " + color4D.r() + " " + color4D.g() + " " + color4D.b() + " " + color4D.a());
+                } else if(key.equals(Assimp.AI_MATKEY_COLOR_REFLECTIVE)) {
+                    AIColor4D color4D = AIColor4D.create();
+                    Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_REFLECTIVE, 0, 0, color4D);
+                    System.out.println("Reflective Color: " + Utils.convertAIColor4DToVector4f(color4D).toString());
                 }
-//                System.out.println();
-
             }
-
-//            AIString path;
-//            for(int j = 1; j < 22; ++j) {
-//                for (int k = 0; k < 10; ++k) {
-//                    path = AIString.create();
-//                    Assimp.aiGetMaterialTexture(material, j, k, path, (IntBuffer) null, (IntBuffer) null, null, null, null, null);
-//                    if(path.dataString() != "") System.out.println(Assimp.TextureTypeToString(j) + "( material: "+ i + ", index: " + k + " ): " + path.dataString());
-//                }
-//            }
         }
-
-//        PointerBuffer textures = scene.mTextures();
-//        for(int i = 0; i < scene.mNumTextures(); ++i) {
-//            AITexture texture = AITexture.create(textures.get(i));
-//            System.out.println(texture.mFilename().dataString());
-//            System.out.println(texture.mWidth() + " " + texture.mHeight());
-//        }
     }
 
     private void adjustTransform() {
@@ -310,7 +270,7 @@ public class Model {
         for (int j = 0 ; j < meshes.length ; j++) {
             AIMesh mesh = AIMesh.create(buffer.get(j));
 
-            System.out.println("Mesh " + j + ": " + mesh.mName().dataString() + ": material index: " + mesh.mMaterialIndex());
+//            System.out.println("Mesh " + j + ": " + mesh.mName().dataString() + ": material index: " + mesh.mMaterialIndex());
 
             AIVector3D.Buffer vertexPositions = mesh.mVertices();
             for(int i = 0; i < vertexPositions.limit(); ++i) {

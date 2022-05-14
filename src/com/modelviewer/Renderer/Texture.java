@@ -17,7 +17,7 @@ public class Texture {
     private String filepath;
     private int width, height;
 
-    public void init(String filepath, boolean asRed) {
+    public boolean init(String filepath, boolean asRed, boolean flipY) {
         this.filepath = filepath;
 
         // Generate texture on GPU
@@ -36,7 +36,7 @@ public class Texture {
         IntBuffer width = BufferUtils.createIntBuffer(1);
         IntBuffer height = BufferUtils.createIntBuffer(1);
         IntBuffer channels = BufferUtils.createIntBuffer(1);
-        stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(flipY);
         ByteBuffer image = stbi_load(filepath, width, height, channels, 0);
 
         if (image != null) {
@@ -60,18 +60,34 @@ public class Texture {
                             0, GL_RED, GL_UNSIGNED_BYTE, image);
             } else {
                 System.out.println("Error: (Texture) Unknown number of channesl '" + channels.get(0) + "'");
-                return;
+                return false;
             }
         } else {
             System.out.println("Error: (Texture) Could not load image '" + filepath + "'");
-            return;
+            return false;
         }
 
         stbi_image_free(image);
+        return true;
     }
 
-    public void init(String filepath) {
-        init(filepath, false);
+    public boolean init(String filepath, boolean asRed) {
+        return init(filepath, asRed, true);
+    }
+
+    public boolean init(String filepath) {
+        return init(filepath, false, true);
+    }
+
+    public void safeBind(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {
+        if(textureSlot >= Utils.queryNumberOfMaxTextureUnits()) {
+            System.out.println("Texture slot number is greater than max texture units number of this system.");
+            System.exit(-1);
+        }
+
+        shaderProgram.safeUpload(shaderSamplerName, textureSlot);
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
+        glBindTexture(GL_TEXTURE_2D, id);
     }
 
     public void bind(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {
@@ -80,7 +96,7 @@ public class Texture {
             System.exit(-1);
         }
 
-        shaderProgram.safeUpload(shaderSamplerName, textureSlot);
+        shaderProgram.upload(shaderSamplerName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, id);
     }

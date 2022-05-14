@@ -13,14 +13,15 @@ import static org.lwjgl.nuklear.Nuklear.*;
 public class NuklearColor {
     private NkContext ctx;
     private NkColorf color;
-    private String name;
+    private String name, shaderVarName;
     private NkVec2 vec2;
 
-    public NuklearColor(NkContext ctx, String name, Vector4f color) {
+    public NuklearColor(NkContext ctx, String name, Vector4f color, String shaderVarName) {
         this.ctx = ctx;
         this.name = name;
         this.color = NkColorf.create().r(color.x).g(color.y).b(color.z).a(color.w);
         this.vec2 = NkVec2.create().x(nk_window_get_width(ctx)).y(400);
+        this.shaderVarName = shaderVarName;
     }
 
     public void updateAndRenderUi(MemoryStack stack) {
@@ -55,10 +56,10 @@ public class NuklearColor {
     }
 
     public void upload(ShaderProgram shaderProgram) {
-        shaderProgram.upload(name, get());
+        shaderProgram.upload(shaderVarName, get());
     }
 
     public void safeUpload(ShaderProgram shaderProgram) {
-        shaderProgram.safeUpload(name, get());
+        shaderProgram.safeUpload(shaderVarName, get());
     }
 }
