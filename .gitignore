@@ -1,5 +1,5 @@
 **.log
 **/.DS_Store
-/TestModels/
-!/TestModels/Drawing4.stl
+resources/TestModels/
+!/resources/TestModels/Drawing4.stl
 /out/

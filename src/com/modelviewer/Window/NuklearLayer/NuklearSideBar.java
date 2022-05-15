@@ -16,7 +16,7 @@ public class NuklearSideBar extends NuklearLayer{
         super(ctx, "", Utils.createNkRect(windowWidth, 0, sideBarWidth, windowHeight), 0);
         maxSideBarWidth = sideBarWidth;
         this.sideBarWidth = 0.0f;
-        this.lock = new NuklearCheckbox(ctx, "Lock");
+        this.lock = new NuklearCheckbox(ctx, "Lock Menu");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class NuklearSideBar extends NuklearLayer{
 
     public void renderUi() {
         nk_layout_row_dynamic(ctx, 20, 2);
-        if(nk_button_label(ctx, "Show/Hide")) {
+        if(nk_button_label(ctx, "Edit Menu")) {
             show = !show;
         }
         lock.renderUi();

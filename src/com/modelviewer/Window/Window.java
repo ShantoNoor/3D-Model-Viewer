@@ -4,13 +4,12 @@ import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
 import com.modelviewer.Window.Input.KeyListener;
 import com.modelviewer.Window.Input.MouseListener;
-import com.modelviewer.Window.NuklearLayer.ApplyTheme;
+import com.modelviewer.Window.NuklearLayer.NuklearTheme;
 import com.modelviewer.Window.NuklearLayer.NuklearLayer;
 import com.modelviewer.Window.NuklearLayer.NuklearLayerTheme;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.nuklear.*;
 import org.lwjgl.opengl.*;
@@ -72,7 +71,6 @@ abstract public class Window {
     private float nearPlane;
     protected Matrix4f projectionMatrix;
 
-    //
     private static final int BUFFER_INITIAL_SIZE = 4 * 1024;
     private static final int MAX_VERTEX_BUFFER  = 512 * 1024;
     private static final int MAX_ELEMENT_BUFFER = 128 * 1024;
@@ -104,7 +102,9 @@ abstract public class Window {
     private int uniform_proj;
 
     protected NuklearLayer info;
-    //
+    protected boolean isInfoShowing;
+
+    private Callback debugProc;
 
     public Window(int width, int height, String title) {
         this.height = height;
@@ -122,10 +122,12 @@ abstract public class Window {
         updateProjectionMatrix();
 
         try {
-            this.ttf = ioResourceToByteBuffer("FiraSans-Light.ttf", 1024 * 1024);
+            this.ttf = ioResourceToByteBuffer("resources/FiraSans-Light.ttf", 1024 * 1024);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        isInfoShowing = false;
     }
 
 
@@ -135,8 +137,6 @@ abstract public class Window {
     }
 
     public void init() {
-        System.out.println("LWJGL Version: " + Version.getVersion());
-
         // setup error callback
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -162,11 +162,6 @@ abstract public class Window {
             throw new IllegalStateException("Failed to create GLFW window.");
         }
 
-//        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
-//        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
-//        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
-//        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
-
         // make the context opengl
         glfwMakeContextCurrent(glfwWindow);
 
@@ -178,8 +173,8 @@ abstract public class Window {
 
         // important line
         GLCapabilities caps      = GL.createCapabilities();
-        //
-        Callback debugProc = GLUtil.setupDebugMessageCallback();
+
+        debugProc = GLUtil.setupDebugMessageCallback();
         if (caps.OpenGL43) {
             GL43.glDebugMessageControl(GL43.GL_DEBUG_SOURCE_API, GL43.GL_DEBUG_TYPE_OTHER, GL43.GL_DEBUG_SEVERITY_NOTIFICATION, (IntBuffer)null, false);
         } else if (caps.GL_KHR_debug) {
@@ -306,8 +301,6 @@ abstract public class Window {
 
         // Enabling Depth Test
         glEnable(GL_DEPTH_TEST);
-
-//        System.out.println("OpenGL Version: " + glGetString(GL_VERSION));
     }
 
     public void run() {
@@ -672,16 +665,18 @@ abstract public class Window {
         float endTime = 0.0f;
         float dt = 0.0f;
 
+        NkRect infoRect = Utils.createNkRect((width-300)/2, (height-300)/2, 300, 200);
         info = new NuklearLayer(ctx,
                 "About",
-                Utils.createNkRect((width-300)/2, (height-300)/2, 300, 200),
-                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_CLOSABLE | NK_WINDOW_NO_SCROLLBAR
+                infoRect,
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR
                 );
 
         while (!glfwWindowShouldClose(glfwWindow)) {
             beginTime = Utils.getTime();
-
             newFrame();
+
+            infoRect.x((width-300)/2).y((height-300)/2).w(300).h(200);
 
             glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
             glClear(windowFlags);
@@ -691,8 +686,8 @@ abstract public class Window {
 
             glfwSwapBuffers(glfwWindow);
 
-            if(!nk_window_is_closed(ctx, "About")) {
-                if(info.begin()) {
+            if(isInfoShowing) {
+                if (info.begin()) {
                     nk_layout_row_dynamic(ctx, 20, 1);
                     String fps = "FPS: " + Integer.toString((int) (1 / dt));
                     nk_text(ctx, fps, NK_TEXT_ALIGN_CENTERED);
@@ -708,24 +703,27 @@ abstract public class Window {
                     nk_text(ctx, "Apply Theme", NK_TEXT_ALIGN_CENTERED);
 
                     nk_layout_row_dynamic(ctx, 20, 3);
-                    if(nk_option_label(ctx, "Default", ApplyTheme.appliedTheme == NuklearLayerTheme.DEFAULT)) {
-                        ApplyTheme.apply(ctx, NuklearLayerTheme.DEFAULT);
+                    if (nk_option_label(ctx, "Default", NuklearTheme.appliedTheme == NuklearLayerTheme.DEFAULT)) {
+                        NuklearTheme.apply(ctx, NuklearLayerTheme.DEFAULT);
                     }
-                    if(nk_option_label(ctx, "White", ApplyTheme.appliedTheme == NuklearLayerTheme.WHITE)) {
-                        ApplyTheme.apply(ctx, NuklearLayerTheme.WHITE);
+                    if (nk_option_label(ctx, "White", NuklearTheme.appliedTheme == NuklearLayerTheme.WHITE)) {
+                        NuklearTheme.apply(ctx, NuklearLayerTheme.WHITE);
                     }
-                    if(nk_option_label(ctx, "Red", ApplyTheme.appliedTheme == NuklearLayerTheme.RED)) {
-                        ApplyTheme.apply(ctx, NuklearLayerTheme.RED);
+                    if (nk_option_label(ctx, "Red", NuklearTheme.appliedTheme == NuklearLayerTheme.RED)) {
+                        NuklearTheme.apply(ctx, NuklearLayerTheme.RED);
                     }
                     nk_layout_row_dynamic(ctx, 20, 3);
-                    if(nk_option_label(ctx, "Blue", ApplyTheme.appliedTheme == NuklearLayerTheme.BLUE)) {
-                        ApplyTheme.apply(ctx, NuklearLayerTheme.BLUE);
+                    if (nk_option_label(ctx, "Blue", NuklearTheme.appliedTheme == NuklearLayerTheme.BLUE)) {
+                        NuklearTheme.apply(ctx, NuklearLayerTheme.BLUE);
                     }
-                    if(nk_option_label(ctx, "Dark", ApplyTheme.appliedTheme == NuklearLayerTheme.DARK)) {
-                        ApplyTheme.apply(ctx, NuklearLayerTheme.DARK);
+                    if (nk_option_label(ctx, "Dark", NuklearTheme.appliedTheme == NuklearLayerTheme.DARK)) {
+                        NuklearTheme.apply(ctx, NuklearLayerTheme.DARK);
                     }
                 }
                 nk_end(ctx);
+                if(MouseListener.isAnyClickOverMainGlfwWindow()) {
+                    isInfoShowing = false;
+                }
             }
 
             endTime = Utils.getTime();
@@ -734,12 +732,43 @@ abstract public class Window {
     }
 
     public void clear() {
+        shutdown();
+
         // Free memory
         glfwFreeCallbacks(glfwWindow);
         glfwDestroyWindow(glfwWindow);
 
+        if (debugProc != null) {
+            debugProc.free();
+        }
+
         glfwTerminate();
-        glfwSetErrorCallback(null).free();
+        Objects.requireNonNull(glfwSetErrorCallback(null)).free();
+    }
+
+    private void shutdown() {
+        Objects.requireNonNull(ctx.clip().copy()).free();
+        Objects.requireNonNull(ctx.clip().paste()).free();
+        nk_free(ctx);
+        destroy();
+        Objects.requireNonNull(default_font.query()).free();
+        Objects.requireNonNull(default_font.width()).free();
+        Objects.requireNonNull(ALLOCATOR.alloc()).free();
+        Objects.requireNonNull(ALLOCATOR.mfree()).free();
+    }
+
+    private void destroy() {
+        glDetachShader(prog, vert_shdr);
+        glDetachShader(prog, frag_shdr);
+        glDeleteShader(vert_shdr);
+        glDeleteShader(frag_shdr);
+        glDeleteProgram(prog);
+        glDeleteTextures(default_font.texture().id());
+        glDeleteTextures(null_texture.texture().id());
+        glDeleteBuffers(vbo);
+        glDeleteBuffers(ebo);
+        nk_buffer_free(cmds);
+        GL.setCapabilities(null);
     }
 
     abstract public void loop(float dt);

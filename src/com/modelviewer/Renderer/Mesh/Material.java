@@ -41,7 +41,7 @@ public class Material {
         specularColor = new NuklearColor(ctx, "Specular Color", new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), "specularColor");
         emissiveColor  = new NuklearColor(ctx, "Emissive Color", new Vector4f(0.0f, 0.0f, 0.0f, 1.0f), "emissiveColor");
 
-        roughnessFactor  = new NuklearFloat(ctx, "Roughness Factor", 0.0f, 0.0f, 1.0f, 0.005f, 0.001f, "roughnessFactor");
+        roughnessFactor  = new NuklearFloat(ctx, "Roughness Factor", 0.10f, 0.0f, 1.0f, 0.005f, 0.001f, "roughnessFactor");
         metallicFactor  = new NuklearFloat(ctx, "Metallic Factor", 1.0f, 0.0f, 1.0f, 0.005f, 0.001f, "metallicFactor");
         shininess  = new NuklearFloat(ctx, "Shininess", 4.0f, 0.0f, 1000.0f, 0.05f, 0.01f, "shininess");
         reflectivity  = new NuklearFloat(ctx, "Reflectivity", 0.0f, 1.0f, 100.0f, 0.05f, 0.01f, "reflectivity");

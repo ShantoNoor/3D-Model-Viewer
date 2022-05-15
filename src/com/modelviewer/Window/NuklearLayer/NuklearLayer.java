@@ -34,6 +34,7 @@ public class NuklearLayer {
     }
 
     public void show() {
+        begin();
         Nuklear.nk_window_show(ctx, title, 1);
     }
 

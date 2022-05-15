@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 import static org.lwjgl.nuklear.Nuklear.*;
 
-public class ApplyTheme {
+public class NuklearTheme {
     public static NuklearLayerTheme appliedTheme = NuklearLayerTheme.DEFAULT;
 
     public static void apply(NkContext context, NuklearLayerTheme nuklearLayerTheme) {
@@ -141,7 +141,6 @@ public class ApplyTheme {
                 nk_style_default(context);
                 return;
             }
-            System.out.println("app");
             nk_style_from_table(context, colors);
         }
     }

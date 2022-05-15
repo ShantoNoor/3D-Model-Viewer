@@ -8,8 +8,11 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
+import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
+import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 import static org.lwjgl.stb.STBImage.*;
 
 public class Texture {
@@ -79,6 +82,48 @@ public class Texture {
         return init(filepath, false, true);
     }
 
+    public boolean initCubeMap(String folderPath) {
+        String[] facesCubemap = new String[6];
+        facesCubemap[0] = folderPath + "/right.jpg";
+        facesCubemap[1] = folderPath + "/left.jpg";
+        facesCubemap[2] = folderPath + "/top.jpg";
+        facesCubemap[3] = folderPath + "/bottom.jpg";
+        facesCubemap[4] = folderPath +  "/front.jpg";
+        facesCubemap[5] = folderPath + "/back.jpg";
+
+        id = glGenTextures();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+        for (int i = 0; i < 6; i++)
+        {
+            IntBuffer width = BufferUtils.createIntBuffer(1);
+            IntBuffer height = BufferUtils.createIntBuffer(1);
+            IntBuffer channels = BufferUtils.createIntBuffer(1);
+            ByteBuffer data = stbi_load(facesCubemap[i], width, height, channels, 0);
+            if (data != null)
+            {
+                stbi_set_flip_vertically_on_load(false);
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width.get(0), height.get(0),
+                        0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                stbi_image_free(data);
+            }
+            else
+            {
+                System.out.println("Failed to load texture: " + facesCubemap[i]);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void safeBind(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {
         if(textureSlot >= Utils.queryNumberOfMaxTextureUnits()) {
             System.out.println("Texture slot number is greater than max texture units number of this system.");
@@ -99,6 +144,28 @@ public class Texture {
         shaderProgram.upload(shaderSamplerName, textureSlot);
         glActiveTexture(GL_TEXTURE0 + textureSlot);
         glBindTexture(GL_TEXTURE_2D, id);
+    }
+
+    public void safeBindCubeMap(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {
+        if(textureSlot >= Utils.queryNumberOfMaxTextureUnits()) {
+            System.out.println("Texture slot number is greater than max texture units number of this system.");
+            System.exit(-1);
+        }
+
+        shaderProgram.safeUpload(shaderSamplerName, textureSlot);
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+    }
+
+    public void bindCubeMap(ShaderProgram shaderProgram, String shaderSamplerName, int textureSlot) {
+        if(textureSlot >= Utils.queryNumberOfMaxTextureUnits()) {
+            System.out.println("Texture slot number is greater than max texture units number of this system.");
+            System.exit(-1);
+        }
+
+        shaderProgram.upload(shaderSamplerName, textureSlot);
+        glActiveTexture(GL_TEXTURE0 + textureSlot);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, id);
     }
 
     public void unbind() {

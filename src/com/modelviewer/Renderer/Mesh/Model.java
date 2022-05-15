@@ -36,7 +36,7 @@ public class Model {
     private static final int BITANGENT_BUFFER = 5;
     private static final int NUMBER_OF_BUFFER = 6;
 
-    private int haveTangents, haveColors;
+    private int haveTangents, haveColors, haveTexCoords;
 
     private VAO vao;
     private VBO[] vbos;
@@ -359,23 +359,30 @@ public class Model {
             }
 
             AIVector3D.Buffer vertexTexCoords = mesh.mTextureCoords(0);
-            if(vertexTexCoords != null)
-                for(int i = 0; i < vertexTexCoords.limit(); ++i) {
+            if(vertexTexCoords != null) {
+                haveTexCoords = 1;
+                for (int i = 0; i < vertexTexCoords.limit(); ++i) {
                     AIVector3D vertexTexCoord = vertexTexCoords.get(i);
 
                     texCords.put(vertexTexCoord.x());
                     texCords.put(vertexTexCoord.y());
                 }
+            } else {
+                haveTexCoords = 0;
+            }
 
             AIVector3D.Buffer vertexNormals = mesh.mNormals();
-            if(vertexNormals != null)
-                for(int i = 0; i < vertexNormals.limit(); i++) {
+            if(vertexNormals != null) {
+                for (int i = 0; i < vertexNormals.limit(); i++) {
                     AIVector3D vertexNormal = vertexNormals.get(i);
 
                     normals.put(vertexNormal.x());
                     normals.put(vertexNormal.y());
                     normals.put(vertexNormal.z());
                 }
+            } else {
+                System.out.println("N is numm");
+            }
 
             AIColor4D.Buffer vertexColours = mesh.mColors(0);
             if(vertexColours != null) {
@@ -448,7 +455,11 @@ public class Model {
         }
 
         vbos[POSITION_BUFFER].uploadVertexAttributeData(vao, positions.flip(), POSITION_BUFFER, 3, BufferDataType.STATIC);
-        vbos[TEX_COORD_BUFFER].uploadVertexAttributeData(vao, texCords.flip(), TEX_COORD_BUFFER, 2, BufferDataType.STATIC);
+
+        if(haveTexCoords > 0) {
+            vbos[TEX_COORD_BUFFER].uploadVertexAttributeData(vao, texCords.flip(), TEX_COORD_BUFFER, 2, BufferDataType.STATIC);
+        }
+
         vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals.flip(), NORMAL_BUFFER, 3, BufferDataType.STATIC);
 
         if(haveColors > 0) {
@@ -528,31 +539,51 @@ public class Model {
     }
 
     public void clear() {
-        positions.clear();
-        texCords.clear();
-        normals.clear();
-        tangents.clear();
-        bitangents.clear();
-        colors.clear();
-        indices.clear();
+        if(positions != null) {
+            positions.clear();
+            positions = null;
+        }
+        if(texCords != null) {
+            texCords.clear();
+            texCords = null;
+        }
+        if(normals != null) {
+            normals.clear();
+            normals = null;
+        }
+        if(tangents != null) {
+            tangents.clear();
+            tangents = null;
+        }
+        if(bitangents != null) {
+            bitangents.clear();
+            bitangents = null;
+        }
+        if(colors != null) {
+            colors.clear();
+            colors = null;
+        }
+        if(indices != null) {
+            indices.clear();
+            indices = null;
+        }
 
-        positions = null;
-        texCords = null;
-        normals = null;
-        tangents = null;
-        bitangents = null;
-        colors = null;
-        indices = null;
 
-        vao.clear();
-        vao = null;
+        if(vao != null) {
+            vao.clear();
+            vao = null;
+        }
 
-        ibo.clear();
-        ibo = null;
+        if(ibo != null) {
+            ibo.clear();
+            ibo = null;
+        }
 
         for(int i = 0; i < vbos.length; ++i) {
-            vbos[i].clear();
-            vbos[i] = null;
+            if(vao != null) {
+                vbos[i].clear();
+                vbos[i] = null;
+            }
         }
 
 
@@ -570,17 +601,25 @@ public class Model {
         flipY.clear();
         flipY = null;
 
-        for(int i = 0; i < materials.length; ++i) {
-            materials[i].clear();
-            materials[i] = null;
+        if(materials != null) {
+            for (int i = 0; i < materials.length; ++i) {
+                if(materials[i] != null) {
+                    materials[i].clear();
+                    materials[i] = null;
+                }
+            }
+            materials = null;
         }
-        materials = null;
 
-        for(int i = 0; i < meshes.length; ++i) {
-            meshes[i].clear();
-            meshes[i] = null;
+        if(meshes != null) {
+            for (int i = 0; i < meshes.length; ++i) {
+                if(meshes[i] != null) {
+                    meshes[i].clear();
+                    meshes[i] = null;
+                }
+            }
+            meshes = null;
         }
-        meshes = null;
     }
 
     public Matrix4f getTransform() {
@@ -629,7 +668,9 @@ public class Model {
             }
             nk_group_end(ctx);
         }
+    }
 
+    public void renderMaterialUi() {
         nk_layout_row_dynamic(ctx, 65, 1);
         if (nk_group_begin_titled(ctx, "Flip Texture Coordinates", "Flip Texture Coordinates", NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
             nk_layout_row_dynamic(ctx, 25, 2);

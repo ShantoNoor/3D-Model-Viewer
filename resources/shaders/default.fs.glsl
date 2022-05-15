@@ -28,10 +28,13 @@ uniform MaterialMap aoMap;
 uniform MaterialMap metallicMap;
 uniform MaterialMap roughnessMap;
 
+uniform samplerCube env;
+
 uniform int flipTexCordX;
 uniform int flipTexCordY;
 
 uniform int haveTangents;
+// todo color
 
 out vec4 finalColor;
 
@@ -79,6 +82,8 @@ void main()
     if(metallicMap.useSampler > 0) {
         finalColor += (finalSpecularColor) * (1-texture(metallicMap.sampler, texCod).r);
     }
+
+    finalColor += ( texture(env, N) + texture(env, reflect(-L, N)) * specularFactor  ) * roughnessFactor;
 
 
 //    vec4 finalBaseColor = texture(baseColor, texCod) * texture(aoMap, texCod).r;
