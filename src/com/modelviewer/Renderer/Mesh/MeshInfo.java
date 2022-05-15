@@ -22,4 +22,10 @@ public class MeshInfo {
         this.min = new Vector3f();
         this.max = new Vector3f();
     }
+
+    public void clear() {
+        min = null;
+        modelTransform = null;
+        max = null;
+    }
 }

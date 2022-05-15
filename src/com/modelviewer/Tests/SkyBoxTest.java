@@ -66,7 +66,7 @@ public class SkyBoxTest extends Window {
         roughnessMap = new Texture();
         roughnessMap.init("TestModels/backpack/roughness.jpg", true);
 
-        model = new Model();
+        model = new Model(ctx);
         model.loadMesh("TestModels/backpack/backpack.obj");
 
         camera = new Camera();

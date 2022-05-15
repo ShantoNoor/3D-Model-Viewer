@@ -136,12 +136,16 @@ public class ShaderProgram {
     public void upload(String varName, Vector4f vec4) {
         FloatBuffer buffer = BufferUtils.createFloatBuffer(4);
         vec4.get(buffer);
-        glUniform3fv(getVarLocation(varName), buffer);
+        glUniform4fv(getVarLocation(varName), buffer);
     }
 
     public void clear() {
         glDeleteProgram(id);
         varLocations.clear();
+        shaders.clear();
+
+        shaders = null;
+        varLocations = null;
     }
 }
 

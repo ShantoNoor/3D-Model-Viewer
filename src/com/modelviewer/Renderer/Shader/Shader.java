@@ -40,6 +40,7 @@ public class Shader {
     public void clear() {
         path = null;
         code = null;
+        type = null;
         glDeleteShader(id);
     }
 }

@@ -27,11 +27,12 @@ public class NuklearImage {
         this.textureSlot = textureSlot;
 
         use = new NuklearCheckbox(ctx, "Use");
+        use.set(0);
         image = NkImage.create();
         image.handle(it -> it.id(Constants.nullTexture.getId()));
     }
 
-    public void updateAndRenderUi() {
+    public void renderUi() {
         nk_layout_row_dynamic(ctx, 285, 1);
         if (nk_group_begin_titled(ctx, name+Float.toString(Utils.getTime()), name, NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
             nk_layout_row_begin(ctx, NK_DYNAMIC, nk_window_get_width(ctx) - 90, 2);
@@ -42,7 +43,7 @@ public class NuklearImage {
             nk_layout_row_push(ctx, 0.2f);
 
             if(textureLoadedSuccessfully) {
-                use.updateAndRenderUi();
+                use.renderUi();
             }
 
             nk_layout_row_dynamic(ctx, 25, 2);
@@ -50,19 +51,19 @@ public class NuklearImage {
                 loadTexture();
             }
             if (nk_button_label(ctx, "Clear")) {
-                clear();
+                tempClear();
             }
             nk_group_end(ctx);
         }
     }
 
     private void loadTexture() {
-        String filePath = tinyfd_openFileDialog("Open Texture File", "", null, "", false);
+        String filePath = tinyfd_openFileDialog(name, "", null, "", false);
 
         if(filePath == null) return;
 
         if(texture != null) {
-            clear();
+            tempClear();
         }
 
         texture = new Texture();
@@ -70,16 +71,29 @@ public class NuklearImage {
         if(texture.init(filePath, asRed)) {
             image.handle(it -> it.id(texture.getId()));
             textureLoadedSuccessfully = true;
+            use.set(1);
         }
     }
 
-    private void clear() {
+    private void tempClear() {
         if(!textureLoadedSuccessfully) return;
         texture.clear();
         texture = null;
         image.handle(it -> it.id(Constants.nullTexture.getId()));
         textureLoadedSuccessfully = false;
         use.set(0);
+    }
+
+    public void clear() {
+        ctx = null;
+        image.clear();
+        image = null;
+        if(texture != null) texture.clear();
+        texture = null;
+        use.clear();
+        use = null;
+        name = null;
+        shaderSamplerName = null;
     }
 
     public void upload(ShaderProgram shaderProgram) {
@@ -94,5 +108,13 @@ public class NuklearImage {
             texture.safeBind(shaderProgram, shaderSamplerName + ".sampler", textureSlot);
         }
         shaderProgram.safeUpload(shaderSamplerName + ".useSampler", use.get());
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void addMaterialName(String materialName) {
+        this.name += " (" + materialName + ")";
     }
 }

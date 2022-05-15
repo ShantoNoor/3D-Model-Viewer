@@ -55,6 +55,7 @@ public class VAO {
 
     public void clear() {
         vertexAttributes.clear();
+        vertexAttributes = null;
         glDeleteVertexArrays(id);
     }
 }

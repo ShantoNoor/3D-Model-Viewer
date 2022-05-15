@@ -123,5 +123,6 @@ public class Texture {
 
     public void clear() {
         glDeleteTextures(id);
+        filepath = null;
     }
  }

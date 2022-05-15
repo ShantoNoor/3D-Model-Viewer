@@ -31,7 +31,7 @@ public class ModelViewer3D extends Window {
         texture = new Texture();
         texture.init("TestModels/pistol2/textures/SAI_Glock19_albedo.tga.png");
 
-        model = new Model();
+        model = new Model(ctx);
         model.loadMesh("TestModels/pistol/source/pistol.fbx");
 
         quad = new Quad();

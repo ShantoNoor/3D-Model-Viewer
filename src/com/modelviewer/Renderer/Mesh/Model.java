@@ -4,6 +4,7 @@ import com.modelviewer.Renderer.*;
 import com.modelviewer.Renderer.Shader.ShaderProgram;
 import com.modelviewer.Utils.Constants;
 import com.modelviewer.Utils.Utils;
+import com.modelviewer.Window.NuklearLayer.NuklearCheckbox;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -22,15 +23,10 @@ import static org.lwjgl.opengl.GL32.glDrawElementsBaseVertex;
 
 public class Model {
     private MeshInfo[] meshes;
-    private Texture[] textures;
+    private Material[] materials;
 
-    private float[] positions;
-    private float[] normals;
-    private float[] texCords;
-    private float[] colors;
-    private int[] indices;
-
-    private FloatBuffer tangents, bitangents;
+    private IntBuffer indices;
+    private FloatBuffer positions, normals, texCords, colors, tangents, bitangents;
 
     private static final int POSITION_BUFFER = 0;
     private static final int TEX_COORD_BUFFER = 1;
@@ -40,14 +36,13 @@ public class Model {
     private static final int BITANGENT_BUFFER = 5;
     private static final int NUMBER_OF_BUFFER = 6;
 
-    private int haveTangents;
+    private int haveTangents, haveColors;
 
-    private VAO vao = new VAO();
-    private VBO[] vbos = new VBO[NUMBER_OF_BUFFER];
-    private IBO ibo = new IBO();
+    private VAO vao;
+    private VBO[] vbos;
+    private IBO ibo;
 
     private int numberOfVertices = 0, numberOfIndices = 0;
-
     private boolean modelSuccessfullyLoaded = false;
 
     private boolean enableRotation = false;
@@ -63,10 +58,28 @@ public class Model {
 
     private Matrix4f transform = new Matrix4f().identity();
 
-    public Model() { }
+    private NkContext ctx;
+
+    private NuklearCheckbox flipX, flipY;
+
+    public Model(NkContext ctx) {
+        this.ctx = ctx;
+        this.flipX = new NuklearCheckbox(ctx, "FlipX");
+        this.flipY = new NuklearCheckbox(ctx, "FlipY");
+        this.vao = new VAO();
+        this.vbos = new VBO[NUMBER_OF_BUFFER];
+        this.ibo = new IBO();
+    }
 
     public boolean loadMesh(String filePath) {
-        if(modelSuccessfullyLoaded) return !modelSuccessfullyLoaded;
+        if(filePath == null) return false;
+
+        if(modelSuccessfullyLoaded) {
+            tempClear();
+            vao = new VAO();
+            vbos = new VBO[NUMBER_OF_BUFFER];
+            ibo = new IBO();
+        }
 
         int importFlags = Assimp.aiProcess_CalcTangentSpace
                             | Assimp.aiProcess_GenSmoothNormals
@@ -85,56 +98,119 @@ public class Model {
 
         if(pScene != null) {
             modelSuccessfullyLoaded = initFromScene(pScene, filePath);
-            processMeshTransform(pScene.mRootNode(), new Matrix4f());
-            adjustTransform();
         } else {
             modelSuccessfullyLoaded = false;
             System.out.println("Error parsing: " + filePath + " " + Assimp.aiGetErrorString().toString());
             System.exit(-1);
         }
 
-         printAllMaterials(pScene);
+        processMeshTransform(pScene.mRootNode(), new Matrix4f());
+        adjustTransform();
+        initAllMaterials(pScene);
 
         return modelSuccessfullyLoaded;
     }
 
-    private void printAllMaterials(AIScene scene) {
+    private void initAllMaterials(AIScene scene) {
         PointerBuffer materials = scene.mMaterials();
-
         for (int i = 0; i < scene.mNumMaterials(); ++i) {
             AIMaterial material = AIMaterial.create(materials.get(i));
 
             PointerBuffer materialProperties = material.mProperties();
+            this.materials[i] = new Material(ctx);
+
             for (int j = 0; j < material.mNumProperties(); ++j) {
                 AIMaterialProperty property = AIMaterialProperty.create(materialProperties.get(j));
                 String key = property.mKey().dataString();
 
-                System.out.println(key);
-
-                if(key.equals(Assimp.AI_MATKEY_NAME)) {
-                    System.out.println(Utils.convertByteBufferToString(property.mData()));
-                } else if(key.equals(Assimp.AI_MATKEY_GLOSSINESS_FACTOR)) {
-                    System.out.println("GLOSSINESS_FACTOR: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_REFLECTIVITY)) {
-                    System.out.println("REFLECTIVITY: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_METALLIC_FACTOR)) {
-                    System.out.println("METALLIC_FACTOR: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_EMISSIVE_INTENSITY)) {
-                    System.out.println("EMISSIVE_INTENSITY: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_ROUGHNESS_FACTOR)) {
-                    System.out.println("ROUGHNESS_FACTOR: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_SHININESS)) {
-                    System.out.println("SHININESS: " + property.mData().getFloat());
-                } else if(key.equals(Assimp.AI_MATKEY_COLOR_SPECULAR)) {
+                if(key.equals(Assimp.AI_MATKEY_NAME))
+                {
+                    this.materials[i].materialName = Utils.convertByteBufferToString(property.mData());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_GLOSSINESS_FACTOR))
+                {
+//                    System.out.println("GLOSSINESS_FACTOR: " + property.mData().getFloat());
+                    this.materials[i].roughnessFactor.set(1.0f - property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_REFLECTIVITY))
+                {
+//                    System.out.println("reflectivity: " + property.mData().getFloat());
+                    this.materials[i].reflectivity.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_METALLIC_FACTOR))
+                {
+//                    System.out.println("metallicFactor: " + property.mData().getFloat());
+                    this.materials[i].metallicFactor.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_EMISSIVE_INTENSITY))
+                {
+//                    System.out.println("emissiveIntensity: " + property.mData().getFloat());
+                    this.materials[i].emissiveIntensity.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_ROUGHNESS_FACTOR))
+                {
+//                    System.out.println("roughnessFactor: " + property.mData().getFloat());
+                    this.materials[i].roughnessFactor.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_SHININESS))
+                {
+//                    System.out.println("shininess: " + property.mData().getFloat());
+                    this.materials[i].shininess.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_SHININESS_STRENGTH))
+                {
+//                    System.out.println("shininessIntensity: " + property.mData().getFloat());
+                    this.materials[i].shininessIntensity.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_SPECULAR_FACTOR))
+                {
+//                    System.out.println("reflectivity: " + property.mData().getFloat());
+                    this.materials[i].reflectivity.set(property.mData().getFloat());
+                }
+                else if(key.equals(Assimp.AI_MATKEY_COLOR_SPECULAR))
+                {
                     AIColor4D color4D = AIColor4D.create();
                     Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_SPECULAR, 0, 0, color4D);
-                    System.out.println("Specular Color: " + color4D.r() + " " + color4D.g() + " " + color4D.b() + " " + color4D.a());
-                } else if(key.equals(Assimp.AI_MATKEY_COLOR_REFLECTIVE)) {
+                    this.materials[i].specularColor.set(Utils.convertAIColor4DToVector4f(color4D));
+//                    Utils.printVector4f(this.materials[i].specularColor.get(), "specular");
+                }
+                else if(key.equals(Assimp.AI_MATKEY_COLOR_REFLECTIVE))
+                {
                     AIColor4D color4D = AIColor4D.create();
                     Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_REFLECTIVE, 0, 0, color4D);
-                    System.out.println("Reflective Color: " + Utils.convertAIColor4DToVector4f(color4D).toString());
+                    this.materials[i].specularColor.set(Utils.convertAIColor4DToVector4f(color4D));
+//                    Utils.printVector4f(this.materials[i].specularColor.get(), "specular");
+                }
+                else if(key.equals(Assimp.AI_MATKEY_COLOR_AMBIENT))
+                {
+                    AIColor4D color4D = AIColor4D.create();
+                    Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_AMBIENT, 0, 0, color4D);
+                    this.materials[i].ambientColor.set(Utils.convertAIColor4DToVector4f(color4D));
+//                    Utils.printVector4f(this.materials[i].ambientColor.get(), "ambient");
+                }
+                else if(key.equals(Assimp.AI_MATKEY_COLOR_DIFFUSE))
+                {
+                    AIColor4D color4D = AIColor4D.create();
+                    Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_DIFFUSE, 0, 0, color4D);
+                    this.materials[i].diffuseColor.set(Utils.convertAIColor4DToVector4f(color4D));
+//                    Utils.printVector4f(this.materials[i].diffuseColor.get(), "diffuse");
+                }
+                else if(key.equals(Assimp.AI_MATKEY_BASE_COLOR))
+                {
+                    AIColor4D color4D = AIColor4D.create();
+                    Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_BASE_COLOR, 0, 0, color4D);
+                    this.materials[i].diffuseColor.set(Utils.convertAIColor4DToVector4f(color4D));
+//                    Utils.printVector4f(this.materials[i].diffuseColor.get(), "diffuse");
+                }
+                else if(key.equals(Assimp.AI_MATKEY_COLOR_EMISSIVE))
+                {
+                    AIColor4D color4D = AIColor4D.create();
+                    Assimp.aiGetMaterialColor(material, Assimp.AI_MATKEY_COLOR_EMISSIVE, 0, 0, color4D);
+                    this.materials[i].emissiveColor.set(Utils.convertAIColor4DToVector4f(color4D));
+//                    Utils.printVector4f(this.materials[i].emissiveColor.get(), "emissive");
                 }
             }
+            this.materials[i].setNames(i);
         }
     }
 
@@ -205,9 +281,12 @@ public class Model {
 
         shaderProgram.upload("transform", transform);
         shaderProgram.upload("haveTangents", haveTangents);
+        shaderProgram.upload("flipTexCordX", flipX.get());
+        shaderProgram.upload("flipTexCordY", flipY.get());
 
         if(modelSuccessfullyLoaded) {
             for (int i = 0; i < meshes.length; ++i) {
+                materials[meshes[i].materialIndex].upload(shaderProgram);
                 shaderProgram.upload("mesh", meshes[i].modelTransform);
                 glDrawElementsBaseVertex(GL_TRIANGLES, meshes[i].numberOfIndices, GL_UNSIGNED_INT, meshes[i].baseIndex * 4, meshes[i].baseVertex);
             }
@@ -220,7 +299,7 @@ public class Model {
 
     private boolean initFromScene(AIScene pScene, String filePath) {
         meshes = new MeshInfo[pScene.mNumMeshes()];
-        textures = new Texture[pScene.mNumMaterials()];
+        materials = new Material[pScene.mNumMaterials()];
 
         countVerticesAndIndices(pScene);
         reserveSpace();
@@ -253,32 +332,30 @@ public class Model {
     }
 
     private void reserveSpace() {
-        positions = new float[numberOfVertices * 3];
-        colors = new float[numberOfVertices * 4];
-        normals = new float[numberOfVertices * 3];
-        texCords = new float[numberOfVertices * 2];
-        indices = new int[numberOfIndices * 3];
-
+        positions = BufferUtils.createFloatBuffer(numberOfVertices * 3);
+        colors = BufferUtils.createFloatBuffer(numberOfVertices * 4);
+        normals = BufferUtils.createFloatBuffer(numberOfVertices * 3);
+        texCords = BufferUtils.createFloatBuffer(numberOfVertices * 2);
+        indices = BufferUtils.createIntBuffer(numberOfIndices * 3);
         tangents = BufferUtils.createFloatBuffer(numberOfVertices * 3);
         bitangents = BufferUtils.createFloatBuffer(numberOfVertices * 3);
     }
 
     private void initAllMeshes(AIScene pScene) {
         PointerBuffer buffer = pScene.mMeshes();
-        int v = 0, t = 0, n = 0, ii = 0, c = 0;
 
         for (int j = 0 ; j < meshes.length ; j++) {
             AIMesh mesh = AIMesh.create(buffer.get(j));
 
-//            System.out.println("Mesh " + j + ": " + mesh.mName().dataString() + ": material index: " + mesh.mMaterialIndex());
+            meshes[j].materialIndex = mesh.mMaterialIndex();
 
             AIVector3D.Buffer vertexPositions = mesh.mVertices();
             for(int i = 0; i < vertexPositions.limit(); ++i) {
                 AIVector3D vertexPosition = vertexPositions.get(i);
 
-                positions[v++] = vertexPosition.x();
-                positions[v++] = vertexPosition.y();
-                positions[v++] = vertexPosition.z();
+                positions.put(vertexPosition.x());
+                positions.put(vertexPosition.y());
+                positions.put(vertexPosition.z());
             }
 
             AIVector3D.Buffer vertexTexCoords = mesh.mTextureCoords(0);
@@ -286,8 +363,8 @@ public class Model {
                 for(int i = 0; i < vertexTexCoords.limit(); ++i) {
                     AIVector3D vertexTexCoord = vertexTexCoords.get(i);
 
-                    texCords[t++] = vertexTexCoord.x();
-                    texCords[t++] = vertexTexCoord.y();
+                    texCords.put(vertexTexCoord.x());
+                    texCords.put(vertexTexCoord.y());
                 }
 
             AIVector3D.Buffer vertexNormals = mesh.mNormals();
@@ -295,28 +372,32 @@ public class Model {
                 for(int i = 0; i < vertexNormals.limit(); i++) {
                     AIVector3D vertexNormal = vertexNormals.get(i);
 
-                    normals[n++] = vertexNormal.x();
-                    normals[n++] = vertexNormal.y();
-                    normals[n++] = vertexNormal.z();
+                    normals.put(vertexNormal.x());
+                    normals.put(vertexNormal.y());
+                    normals.put(vertexNormal.z());
                 }
 
             AIColor4D.Buffer vertexColours = mesh.mColors(0);
-            if(vertexColours != null)
-                for(int i = 0; i < vertexColours.limit(); i++) {
+            if(vertexColours != null) {
+                haveColors = 1;
+                for (int i = 0; i < vertexColours.limit(); i++) {
                     AIColor4D vertexColor = vertexColours.get(i);
 
-                    colors[c++] = vertexColor.r();
-                    colors[c++] = vertexColor.g();
-                    colors[c++] = vertexColor.b();
-                    colors[c++] = vertexColor.a();
+                    colors.put(vertexColor.r());
+                    colors.put(vertexColor.g());
+                    colors.put(vertexColor.b());
+                    colors.put(vertexColor.a());
                 }
+            } else {
+                haveColors = 0;
+            }
 
             for(int i = 0; i < mesh.mNumFaces(); i++) {
                 AIFace face = mesh.mFaces().get(i);
 
-                indices[ii++] = face.mIndices().get(0);
-                indices[ii++] = face.mIndices().get(1);
-                indices[ii++] = face.mIndices().get(2);
+                indices.put(face.mIndices().get(0));
+                indices.put(face.mIndices().get(1));
+                indices.put(face.mIndices().get(2));
             }
 
             // Setup bounding box
@@ -360,33 +441,146 @@ public class Model {
         }
     }
 
-    // private boolean initMaterials(AIScene pScene, String filePath) {}
-
     private void loadBuffers() {
         vao.bind();
         for(int i = 0; i < vbos.length; ++i) {
             vbos[i] = new VBO();
         }
 
-        vbos[POSITION_BUFFER].uploadVertexAttributeData(vao, positions, POSITION_BUFFER, 3, BufferDataType.STATIC);
-        vbos[TEX_COORD_BUFFER].uploadVertexAttributeData(vao, texCords, TEX_COORD_BUFFER, 2, BufferDataType.STATIC);
-        vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals, NORMAL_BUFFER, 3, BufferDataType.STATIC);
-        vbos[COLOR_BUFFER].uploadVertexAttributeData(vao, colors, COLOR_BUFFER, 4, BufferDataType.STATIC);
+        vbos[POSITION_BUFFER].uploadVertexAttributeData(vao, positions.flip(), POSITION_BUFFER, 3, BufferDataType.STATIC);
+        vbos[TEX_COORD_BUFFER].uploadVertexAttributeData(vao, texCords.flip(), TEX_COORD_BUFFER, 2, BufferDataType.STATIC);
+        vbos[NORMAL_BUFFER].uploadVertexAttributeData(vao, normals.flip(), NORMAL_BUFFER, 3, BufferDataType.STATIC);
+
+        if(haveColors > 0) {
+            vbos[COLOR_BUFFER].uploadVertexAttributeData(vao, colors.flip(), COLOR_BUFFER, 4, BufferDataType.STATIC);
+        }
 
         if(haveTangents > 0) {
             vbos[TANGENT_BUFFER].uploadVertexAttributeData(vao, tangents.flip(), TANGENT_BUFFER, 3, BufferDataType.STATIC);
             vbos[BITANGENT_BUFFER].uploadVertexAttributeData(vao, bitangents.flip(), BITANGENT_BUFFER, 3, BufferDataType.STATIC);
         }
 
-        ibo.uploadIndicesData(vao, indices, BufferDataType.STATIC);
+        ibo.uploadIndicesData(vao, indices.flip(), BufferDataType.STATIC);
         vao.unbind();
     }
 
-    public void clear() {
+    private void tempClear() {
+        positions.clear();
+        texCords.clear();
+        normals.clear();
+        tangents.clear();
+        bitangents.clear();
+        colors.clear();
+        indices.clear();
+
+        positions = null;
+        texCords = null;
+        normals = null;
+        tangents = null;
+        bitangents = null;
+        colors = null;
+        indices = null;
+
         vao.clear();
+        vao = null;
+
+        ibo.clear();
+        ibo = null;
+
         for(int i = 0; i < vbos.length; ++i) {
             vbos[i].clear();
+            vbos[i] = null;
         }
+
+        numberOfVertices = 0;
+        numberOfIndices = 0;
+
+        haveTangents = 0;
+        haveColors = 0;
+
+        modelSuccessfullyLoaded = false;
+        enableRotation = false;
+        axisOfRotation = Constants.Y_AXIS;
+        rotationAxis = 1;
+
+        min = new Vector3f(Float.MAX_VALUE);
+        max = new Vector3f(Float.MIN_VALUE);
+        origin = new Vector3f(0.0f);
+        minDistance = 15.0f;
+        maxDistance = 30.0f;
+
+        transform = new Matrix4f().identity();
+
+        flipX.set(0);
+        flipY.set(0);
+
+        for(int i = 0; i < materials.length; ++i) {
+            materials[i].clear();
+            materials[i] = null;
+        }
+        materials = null;
+
+        for(int i = 0; i < meshes.length; ++i) {
+            meshes[i].clear();
+            meshes[i] = null;
+        }
+        meshes = null;
+    }
+
+    public void clear() {
+        positions.clear();
+        texCords.clear();
+        normals.clear();
+        tangents.clear();
+        bitangents.clear();
+        colors.clear();
+        indices.clear();
+
+        positions = null;
+        texCords = null;
+        normals = null;
+        tangents = null;
+        bitangents = null;
+        colors = null;
+        indices = null;
+
+        vao.clear();
+        vao = null;
+
+        ibo.clear();
+        ibo = null;
+
+        for(int i = 0; i < vbos.length; ++i) {
+            vbos[i].clear();
+            vbos[i] = null;
+        }
+
+
+        axisOfRotation = null;
+        ctx = null;
+
+        min = null;
+        max = null;
+        origin = null;
+
+        transform = null;
+
+        flipX.clear();
+        flipX = null;
+        flipY.clear();
+        flipY = null;
+
+        for(int i = 0; i < materials.length; ++i) {
+            materials[i].clear();
+            materials[i] = null;
+        }
+        materials = null;
+
+        for(int i = 0; i < meshes.length; ++i) {
+            meshes[i].clear();
+            meshes[i] = null;
+        }
+        meshes = null;
     }
 
     public Matrix4f getTransform() {
@@ -407,7 +601,7 @@ public class Model {
         }
     }
 
-    public void renderUi(NkContext ctx) {
+    public void renderUi() {
         nk_layout_row_dynamic(ctx, 120, 1);
         if (nk_group_begin_titled(ctx, "ModelSpin", "Model Spin", NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
             nk_layout_row_dynamic(ctx, 25, 2);
@@ -434,6 +628,20 @@ public class Model {
                 rotationAxis = 2;
             }
             nk_group_end(ctx);
+        }
+
+        nk_layout_row_dynamic(ctx, 65, 1);
+        if (nk_group_begin_titled(ctx, "Flip Texture Coordinates", "Flip Texture Coordinates", NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
+            nk_layout_row_dynamic(ctx, 25, 2);
+            flipX.renderUi();
+            flipY.renderUi();
+            nk_group_end(ctx);
+        }
+
+        if(modelSuccessfullyLoaded) {
+            for (int i = 0; i < materials.length; ++i) {
+                materials[i].renderUi();
+            }
         }
     }
 }

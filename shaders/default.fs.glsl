@@ -10,10 +10,22 @@ struct MaterialMap {
     sampler2D sampler;
 };
 
-uniform MaterialMap baseColor;
+uniform vec4 ambientColor;
+uniform vec4 diffuseColor;
+uniform vec4 specularColor;
+uniform vec4 emissiveColor;
+
+uniform float roughnessFactor;
+uniform float metallicFactor;
+uniform float shininess;
+uniform float reflectivity;
+uniform float shininessIntensity;
+uniform float emissiveIntensity;
+
+uniform MaterialMap baseColorMap;
 uniform MaterialMap normalMap;
 uniform MaterialMap aoMap;
-uniform MaterialMap metalnessMap;
+uniform MaterialMap metallicMap;
 uniform MaterialMap roughnessMap;
 
 uniform int flipTexCordX;
@@ -21,7 +33,6 @@ uniform int flipTexCordY;
 
 uniform int haveTangents;
 
-uniform float shineness;
 out vec4 finalColor;
 
 in mat3 TBN;
@@ -47,12 +58,12 @@ void main()
     float lightFactor = max(dot(N, L), 0);
     float specularFactor = 0;
     if(lightFactor > 0)
-        specularFactor = pow(max(dot(reflect(-L, N), H), 0.0), shineness);
+        specularFactor = pow(max(dot(reflect(-L, N), H), 0.0), shininess);
 
-    finalColor = vec4(0.15f, 0.15f, 0.15f, 1.0f) * lightFactor + specularFactor;
+    finalColor = diffuseColor * lightFactor + specularFactor;
 
-    if(baseColor.useSampler > 0) {
-        finalColor = texture(baseColor.sampler, texCod) * lightFactor;
+    if(baseColorMap.useSampler > 0) {
+        finalColor = texture(baseColorMap.sampler, texCod) * lightFactor;
     }
 
     if(aoMap.useSampler > 0) {
@@ -65,8 +76,8 @@ void main()
         finalSpecularColor *= (1-texture(roughnessMap.sampler, texCod).r);
     }
 
-    if(metalnessMap.useSampler > 0) {
-        finalColor += (finalSpecularColor) * (1-texture(metalnessMap.sampler, texCod).r);
+    if(metallicMap.useSampler > 0) {
+        finalColor += (finalSpecularColor) * (1-texture(metallicMap.sampler, texCod).r);
     }
 
 

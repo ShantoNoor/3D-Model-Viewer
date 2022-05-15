@@ -43,4 +43,13 @@ public class Quad {
         ibo.unbind();
         vao.unbind();
     }
+
+    public void clear() {
+        vao.clear();
+        vbo.clear();
+        ibo.clear();
+
+        vertexArray = null;
+        elementArray = null;
+    }
 }

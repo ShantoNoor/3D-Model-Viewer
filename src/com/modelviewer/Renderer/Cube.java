@@ -67,4 +67,12 @@ public class Cube {
         vbo.unbind();
         vao.unbind();
     }
+
+    public void clear() {
+        vao.clear();
+        vbo.clear();
+        vao = null;
+        vbo = null;
+        skyboxVertices = null;
+    }
 }

@@ -2,6 +2,7 @@ package com.modelviewer.Renderer;
 
 import com.modelviewer.Utils.Utils;
 
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -40,6 +41,16 @@ public class IBO {
         vao.unbind();
 
         count = indicesArray.length;
+    }
+
+    public void uploadIndicesData(VAO vao, IntBuffer indicesBuffer, BufferDataType bufferDataType) {
+        vao.bind();
+        bind();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, bufferDataType.getValue());
+        unbind();
+        vao.unbind();
+
+        count = indicesBuffer.limit();
     }
 
     public int getCount() {

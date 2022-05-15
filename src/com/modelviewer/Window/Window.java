@@ -121,13 +121,11 @@ abstract public class Window {
 
         updateProjectionMatrix();
 
-        //
         try {
             this.ttf = ioResourceToByteBuffer("FiraSans-Light.ttf", 1024 * 1024);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //
     }
 
 
@@ -414,12 +412,15 @@ abstract public class Window {
 
     private NkContext setupWindow(long win) {
         glfwSetScrollCallback(win, (window, xoffset, yoffset) -> {
-            MouseListener.mouseScrollCallback(window, xoffset, yoffset);
-            try (MemoryStack stack = stackPush()) {
-                NkVec2 scroll = NkVec2.malloc(stack)
-                        .x((float)xoffset)
-                        .y((float)yoffset);
-                nk_input_scroll(ctx, scroll);
+            if(MouseListener.getIsAboveMainGlfwWindow()) {
+                MouseListener.mouseScrollCallback(window, xoffset, yoffset);
+            } else {
+                try (MemoryStack stack = stackPush()) {
+                    NkVec2 scroll = NkVec2.malloc(stack)
+                            .x((float) xoffset)
+                            .y((float) yoffset);
+                    nk_input_scroll(ctx, scroll);
+                }
             }
         });
         glfwSetCharCallback(win, (window, codepoint) -> nk_input_unicode(ctx, codepoint));
@@ -569,20 +570,6 @@ abstract public class Window {
 
         nk_input_begin(ctx);
         glfwPollEvents();
-
-        NkMouse mouse = ctx.input().mouse();
-        if (mouse.grab()) {
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-        } else if (mouse.grabbed()) {
-            float prevX = mouse.prev().x();
-            float prevY = mouse.prev().y();
-            glfwSetCursorPos(glfwWindow, prevX, prevY);
-            mouse.pos().x(prevX);
-            mouse.pos().y(prevY);
-        } else if (mouse.ungrab()) {
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        }
-        nk_input_end(ctx);
     }
 
     private void render(int AA, int max_vertex_buffer, int max_element_buffer) {

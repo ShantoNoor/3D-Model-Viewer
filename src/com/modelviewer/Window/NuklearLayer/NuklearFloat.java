@@ -31,7 +31,7 @@ public class NuklearFloat {
         this.value[0] = value;
     }
 
-    public void updateAndRenderUi() {
+    public void renderUi() {
         nk_layout_row_dynamic(ctx, 60, 1);
         if(nk_group_begin(ctx, name, NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR)) {
             nk_layout_row_dynamic(ctx, 20, 1);
@@ -52,5 +52,20 @@ public class NuklearFloat {
 
     public void safeUpload(ShaderProgram shaderProgram) {
         shaderProgram.safeUpload(shaderVarName, value[0]);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void addMaterialName(String materialName) {
+        this.name += " (" + materialName + ")";
+    }
+
+    public void clear() {
+        ctx = null;
+        value = null;
+        name = null;
+        shaderVarName = null;
     }
 }

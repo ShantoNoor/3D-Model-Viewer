@@ -211,4 +211,16 @@ public class Camera {
         pitch = 0.0f;
         cameraRotations.identity();
     }
+
+    public void clear() {
+        position = null;
+        UP = null;
+        RIGHT = null;
+        viewDirection = null;
+        defaultPosition = null;
+        normalizedCameraRightVector = null;
+        cameraRotations = null;
+        previousOrbitMouseVector = null;
+        cameraModes = null;
+    }
 }

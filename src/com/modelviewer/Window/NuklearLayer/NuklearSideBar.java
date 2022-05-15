@@ -6,13 +6,13 @@ import org.lwjgl.nuklear.NkContext;
 
 import static org.lwjgl.nuklear.Nuklear.*;
 
-public class SideBar extends NuklearLayer{
+public class NuklearSideBar extends NuklearLayer{
     private float sideBarWidth;
     private float maxSideBarWidth;
-    private boolean show = true;
+    private boolean show = false;
     private NuklearCheckbox lock;
 
-    public SideBar(NkContext ctx, float sideBarWidth, float windowWidth, float windowHeight) {
+    public NuklearSideBar(NkContext ctx, float sideBarWidth, float windowWidth, float windowHeight) {
         super(ctx, "", Utils.createNkRect(windowWidth, 0, sideBarWidth, windowHeight), 0);
         maxSideBarWidth = sideBarWidth;
         this.sideBarWidth = 0.0f;
@@ -23,6 +23,11 @@ public class SideBar extends NuklearLayer{
     public boolean begin() {
         update();
         return super.begin();
+    }
+
+    public void updateSize(int windowWidth, int windowHeight) {
+        rect.h(windowHeight);
+        rect.x(windowWidth+maxSideBarWidth - (2 * sideBarWidth));
     }
 
     private void update() {
@@ -47,6 +52,6 @@ public class SideBar extends NuklearLayer{
         if(nk_button_label(ctx, "Show/Hide")) {
             show = !show;
         }
-        lock.updateAndRenderUi();
+        lock.renderUi();
     }
 }

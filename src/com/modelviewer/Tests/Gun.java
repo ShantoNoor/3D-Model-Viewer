@@ -45,7 +45,7 @@ public class Gun extends Window {
         roughnessMap = new Texture();
         roughnessMap.init("TestModels/pistol2/textures/SAI_Glock19_roughness.tga.png", true);
 
-        model = new Model();
+        model = new Model(ctx);
 
         model.loadMesh("TestModels/pistol2/source/pistol.fbx");
 //        model.loadMesh("TestModels/pistol/source/pistol.fbx");

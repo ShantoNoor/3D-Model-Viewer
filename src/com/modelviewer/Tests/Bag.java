@@ -46,7 +46,7 @@ public class Bag extends Window {
         roughnessMap = new Texture();
         roughnessMap.init("TestModels/backpack/roughness.jpg", true);
 
-        model = new Model();
+        model = new Model(ctx);
 //        model.loadMesh("TestModels/dragon.obj");
 //        model.loadMesh("TestModels/dragon/Dragon_Baked_Actions_fbx_7.4_binary.fbx");
 //        model.loadMesh("TestModels/nanosuit/nanosuit.obj");

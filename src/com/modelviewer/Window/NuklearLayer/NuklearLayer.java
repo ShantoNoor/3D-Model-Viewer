@@ -36,4 +36,11 @@ public class NuklearLayer {
     public void show() {
         Nuklear.nk_window_show(ctx, title, 1);
     }
+
+    public void clear() {
+        ctx = null;
+        title = null;
+        rect.clear();
+        rect = null;
+    }
 }

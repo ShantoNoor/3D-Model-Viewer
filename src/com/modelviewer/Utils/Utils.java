@@ -99,9 +99,16 @@ public class Utils {
     public static void printVector3f(Vector3f vec3) {
         System.out.println(vec3.x + " " + vec3.y + " " + vec3.z);
     }
+    public static void printVector4f(Vector4f vec4) {
+        System.out.println(vec4.x + " " + vec4.y + " " + vec4.z + " " + vec4.w);
+    }
 
     public static void printVector3f(Vector3f vec3, String vec3Name) {
         System.out.println(vec3Name + ": " + vec3.x + " " + vec3.y + " " + vec3.z);
+    }
+
+    public static void printVector4f(Vector4f vec4, String vec4Name) {
+        System.out.println(vec4Name + ": " + vec4.x + " " + vec4.y + " " + vec4.z + " " + vec4.w);
     }
 
     public static Vector3f mulVector3fWithQuaternionf(Vector3f vec3, Quaternionf quat) {

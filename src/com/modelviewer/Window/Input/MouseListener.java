@@ -101,7 +101,7 @@ public class MouseListener {
     }
 
     public static boolean isScrollingOverMainGlfwWindow() {
-        return get().isScrolling & get().isAboveMainGlfwWindow;
+        return get().isScrolling && get().isAboveMainGlfwWindow;
     }
 
     public static void stopScrolling() {
@@ -130,4 +130,6 @@ public class MouseListener {
     public static void setIsAboveMainGlfwWindow(boolean value) {
         get().isAboveMainGlfwWindow = value;
     }
+
+    public static boolean getIsAboveMainGlfwWindow() { return get().isAboveMainGlfwWindow; }
 }

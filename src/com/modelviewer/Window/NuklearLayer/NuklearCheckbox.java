@@ -21,12 +21,16 @@ public class NuklearCheckbox {
         this.name = name;
     }
 
-    public void updateAndRenderUi() {
+    public void renderUi() {
         nk_checkbox_flags_text(ctx, name, value, checkedValue);
     }
 
-    public void set(int value) {
-        this.value[0] = value;
+    public void set(float value) {
+        if(value > 0) {
+            this.value[0] = this.checkedValue;
+        } else {
+            this.value[0] = 0;
+        }
     }
 
     public int get() {
@@ -35,5 +39,19 @@ public class NuklearCheckbox {
 
     public boolean isChecked() {
         return value[0] > 0;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void addMaterialName(String materialName) {
+        this.name += " (" + materialName + ")";
+    }
+
+    public void clear() {
+        ctx = null;
+        value = null;
+        name = null;
     }
 }
