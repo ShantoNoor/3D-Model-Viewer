@@ -12,5 +12,5 @@ void main()
     mat4 modView = mat4(mat3(view));
     vec4 pos = projection * modView * vec4(aPos, 1.0);
     gl_Position = pos.xyww;
-    texCords = vec3(aPos.x, aPos.y, -aPos.z);
+    texCords = vec3(aPos.x, aPos.y, aPos.z);
 }

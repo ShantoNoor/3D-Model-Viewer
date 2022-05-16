@@ -20,6 +20,8 @@ out vec4 fCol;
 out vec3 fPos;
 out vec3 LD;
 
+
+out mat4 vi;
 out mat3 TBN;
 
 void main()
@@ -28,13 +30,11 @@ void main()
     fCol = aCol;
 
     mat4 model = transform * mesh;
-    mat3 modelForNormal = mat3(transpose(inverse(view * model)));
+    mat3 modelForNormal = mat3(transpose(inverse(model)));
     fNor = modelForNormal * aNor;
 
-    fPos = vec3(view * model * vec4(aPos, 1.0f));
-    gl_Position =  projection * vec4(fPos, 1.0f);
-
-    LD = vec3(view * vec4(lightDir, 1.0f));
+    fPos = vec3(model * vec4(aPos, 1.0f));
+    gl_Position = projection * view * vec4(fPos, 1.0f);
 
     if(haveTangents > 0) {
         vec3 T = normalize(modelForNormal * aTan);

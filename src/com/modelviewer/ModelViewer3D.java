@@ -74,9 +74,8 @@ public class ModelViewer3D extends Window {
 
         shaderProgram.safeUpload("projection", projectionMatrix);
         shaderProgram.safeUpload("view", camera.getViewMatrix());
-        shaderProgram.safeUpload("camPos", camera.getPosition());
-        shaderProgram.safeUpload("lightDir", new Vector3f(0, 110.0f, 110.0f));
-        cubeMap.getCubeMaps(0).safeBindCubeMap(shaderProgram, "env", 6);
+        shaderProgram.safeUpload("cameraPos", camera.getPosition());
+        cubeMap.getCubeMaps().safeBindCubeMap(shaderProgram, "env", 6);
 
         model.updateRotation(dt);
         model.render(shaderProgram);

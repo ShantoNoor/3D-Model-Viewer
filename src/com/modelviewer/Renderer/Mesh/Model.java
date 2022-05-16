@@ -132,11 +132,6 @@ public class Model {
 //                    System.out.println("GLOSSINESS_FACTOR: " + property.mData().getFloat());
                     this.materials[i].roughnessFactor.set(1.0f - property.mData().getFloat());
                 }
-                else if(key.equals(Assimp.AI_MATKEY_REFLECTIVITY))
-                {
-//                    System.out.println("reflectivity: " + property.mData().getFloat());
-                    this.materials[i].reflectivity.set(property.mData().getFloat());
-                }
                 else if(key.equals(Assimp.AI_MATKEY_METALLIC_FACTOR))
                 {
 //                    System.out.println("metallicFactor: " + property.mData().getFloat());
@@ -156,16 +151,6 @@ public class Model {
                 {
 //                    System.out.println("shininess: " + property.mData().getFloat());
                     this.materials[i].shininess.set(property.mData().getFloat());
-                }
-                else if(key.equals(Assimp.AI_MATKEY_SHININESS_STRENGTH))
-                {
-//                    System.out.println("shininessIntensity: " + property.mData().getFloat());
-                    this.materials[i].shininessIntensity.set(property.mData().getFloat());
-                }
-                else if(key.equals(Assimp.AI_MATKEY_SPECULAR_FACTOR))
-                {
-//                    System.out.println("reflectivity: " + property.mData().getFloat());
-                    this.materials[i].reflectivity.set(property.mData().getFloat());
                 }
                 else if(key.equals(Assimp.AI_MATKEY_COLOR_SPECULAR))
                 {

@@ -101,7 +101,7 @@ public class CubeMap {
         return ret1 && ret2;
     }
 
-    public Texture getCubeMaps(int index) {
-        return cubeMaps.get(index);
+    public Texture getCubeMaps() {
+        return cubeMaps.get(activeCubeMapIndex);
     }
 }

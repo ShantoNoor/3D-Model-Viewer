@@ -22,8 +22,6 @@ public class Material {
     public NuklearFloat roughnessFactor;
     public NuklearFloat metallicFactor;
     public NuklearFloat shininess;
-    public NuklearFloat reflectivity;
-    public NuklearFloat shininessIntensity;
     public NuklearFloat emissiveIntensity;
     public NuklearImage baseColorMap;
     public NuklearImage normalMap;
@@ -44,9 +42,7 @@ public class Material {
         roughnessFactor  = new NuklearFloat(ctx, "Roughness Factor", 0.10f, 0.0f, 1.0f, 0.005f, 0.001f, "roughnessFactor");
         metallicFactor  = new NuklearFloat(ctx, "Metallic Factor", 1.0f, 0.0f, 1.0f, 0.005f, 0.001f, "metallicFactor");
         shininess  = new NuklearFloat(ctx, "Shininess", 4.0f, 0.0f, 1000.0f, 0.05f, 0.01f, "shininess");
-        reflectivity  = new NuklearFloat(ctx, "Reflectivity", 0.0f, 1.0f, 100.0f, 0.05f, 0.01f, "reflectivity");
-        shininessIntensity  = new NuklearFloat(ctx, "Shininess Intensity", 1.0f, 0.0f, 1.0f, 0.005f, 0.001f, "shininessIntensity");
-        emissiveIntensity  = new NuklearFloat(ctx, "Mmissive Intensity", 1.0f, 0.0f, 1.0f, 0.005f, 0.001f, "emissiveIntensity");
+        emissiveIntensity  = new NuklearFloat(ctx, "Emissive Intensity", 1.0f, 0.0f, 1.0f, 0.005f, 0.001f, "emissiveIntensity");
 
         baseColorMap = new NuklearImage(ctx, "Albedo Map", false, "baseColorMap", 0);
         normalMap = new NuklearImage(ctx, "Normal Map", false, "normalMap", 1);
@@ -64,8 +60,6 @@ public class Material {
         roughnessFactor.addMaterialName(materialName);
         metallicFactor.addMaterialName(materialName);
         shininess.addMaterialName(materialName);
-        reflectivity.addMaterialName(materialName);
-        shininessIntensity.addMaterialName(materialName);
         emissiveIntensity.addMaterialName(materialName);
         baseColorMap.addMaterialName(materialName);
         normalMap.addMaterialName(materialName);
@@ -75,7 +69,7 @@ public class Material {
     }
 
     public void renderUi() {
-        nk_layout_row_dynamic(ctx, 2125, 1);
+        nk_layout_row_dynamic(ctx, 2000, 1);
         if(nk_group_begin_titled(ctx, materialName, materialName, NK_WINDOW_BORDER | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_TITLE)) {
             ambientColor.renderUi();
             diffuseColor.renderUi();
@@ -84,8 +78,6 @@ public class Material {
             roughnessFactor.renderUi();
             metallicFactor.renderUi();
             shininess.renderUi();
-            reflectivity.renderUi();
-            shininessIntensity.renderUi();
             emissiveIntensity.renderUi();
             baseColorMap.renderUi();
             normalMap.renderUi();
@@ -104,8 +96,6 @@ public class Material {
         roughnessFactor.upload(shaderProgram);
         metallicFactor.upload(shaderProgram);
         shininess.upload(shaderProgram);
-        reflectivity.upload(shaderProgram);
-        shininessIntensity.upload(shaderProgram);
         emissiveIntensity.upload(shaderProgram);
         baseColorMap.upload(shaderProgram);
         normalMap.upload(shaderProgram);
@@ -122,8 +112,6 @@ public class Material {
         roughnessFactor.safeUpload(shaderProgram);
         metallicFactor.safeUpload(shaderProgram);
         shininess.safeUpload(shaderProgram);
-        reflectivity.safeUpload(shaderProgram);
-        shininessIntensity.safeUpload(shaderProgram);
         emissiveIntensity.safeUpload(shaderProgram);
         baseColorMap.safeUpload(shaderProgram);
         normalMap.safeUpload(shaderProgram);
@@ -143,8 +131,6 @@ public class Material {
         roughnessFactor.clear();
         metallicFactor.clear();
         shininess.clear();
-        reflectivity.clear();
-        shininessIntensity.clear();
         emissiveIntensity.clear();
         baseColorMap.clear();
         normalMap.clear();
@@ -159,8 +145,6 @@ public class Material {
         roughnessFactor = null;
         metallicFactor = null;
         shininess = null;
-        reflectivity = null;
-        shininessIntensity = null;
         emissiveIntensity = null;
         baseColorMap = null;
         normalMap = null;
