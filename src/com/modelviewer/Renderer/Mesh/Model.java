@@ -74,13 +74,6 @@ public class Model {
     public boolean loadMesh(String filePath) {
         if(filePath == null) return false;
 
-        if(modelSuccessfullyLoaded) {
-            tempClear();
-            vao = new VAO();
-            vbos = new VBO[NUMBER_OF_BUFFER];
-            ibo = new IBO();
-        }
-
         int importFlags = Assimp.aiProcess_CalcTangentSpace
                             | Assimp.aiProcess_GenSmoothNormals
                             | Assimp.aiProcess_JoinIdenticalVertices
@@ -97,11 +90,18 @@ public class Model {
         AIScene pScene = Assimp.aiImportFile(filePath, importFlags);
 
         if(pScene != null) {
+            if(modelSuccessfullyLoaded) {
+                tempClear();
+                vao = new VAO();
+                vbos = new VBO[NUMBER_OF_BUFFER];
+                ibo = new IBO();
+            }
+
             modelSuccessfullyLoaded = initFromScene(pScene, filePath);
         } else {
             modelSuccessfullyLoaded = false;
             System.out.println("Error parsing: " + filePath + " " + Assimp.aiGetErrorString().toString());
-            System.exit(-1);
+            return modelSuccessfullyLoaded;
         }
 
         processMeshTransform(pScene.mRootNode(), new Matrix4f());

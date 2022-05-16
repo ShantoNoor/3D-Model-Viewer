@@ -665,18 +665,19 @@ abstract public class Window {
         float endTime = 0.0f;
         float dt = 0.0f;
 
-        NkRect infoRect = Utils.createNkRect((width-300)/2, (height-300)/2, 300, 200);
+        float infoWindowWidth = 410, infoWindowHeight = 410;
+        NkRect infoRect = Utils.createNkRect((width-infoWindowWidth)/2, (height-infoWindowHeight)/2, infoWindowWidth, infoWindowHeight);
         info = new NuklearLayer(ctx,
                 "About",
                 infoRect,
-                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR
+                NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_MINIMIZABLE | NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_SCALABLE
                 );
 
         while (!glfwWindowShouldClose(glfwWindow)) {
             beginTime = Utils.getTime();
             newFrame();
 
-            infoRect.x((width-300)/2).y((height-300)/2).w(300).h(200);
+            infoRect.x((width-infoWindowWidth)/2).y((height-infoWindowHeight)/2).w(infoWindowWidth).h(infoWindowHeight);
 
             glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
             glClear(windowFlags);
@@ -700,6 +701,9 @@ abstract public class Window {
                     nk_text(ctx, openglVersion, NK_TEXT_ALIGN_CENTERED);
 
                     nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "", NK_TEXT_LEFT);
+
+                    nk_layout_row_dynamic(ctx, 20, 1);
                     nk_text(ctx, "Apply Theme", NK_TEXT_ALIGN_CENTERED);
 
                     nk_layout_row_dynamic(ctx, 20, 3);
@@ -719,6 +723,23 @@ abstract public class Window {
                     if (nk_option_label(ctx, "Dark", NuklearTheme.appliedTheme == NuklearLayerTheme.DARK)) {
                         NuklearTheme.apply(ctx, NuklearLayerTheme.DARK);
                     }
+
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "How to Use:", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "# Press W, A, S, D, Q, E key for Moving.", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "# Hold and Drag Left Mouse Button to Orbit.", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "# Hold and Drag Right Mouse Button for FPS style Looking.", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "Combine with W, A, S, D for FPS style Moving.", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "# Scroll for Zoom.", NK_TEXT_LEFT);
+                    nk_layout_row_dynamic(ctx, 20, 1);
+                    nk_text(ctx, "# Press R to reset the Camera.", NK_TEXT_LEFT);
                 }
                 nk_end(ctx);
                 if(MouseListener.isAnyClickOverMainGlfwWindow()) {
